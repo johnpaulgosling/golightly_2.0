@@ -166,6 +166,10 @@ The region where the account says one would run the nested filter is small \(d_\
 
 Will appear in the paper. The account and the cells that were measured. No curve is drawn through a cell that was not run.
 
+## Amendment, 15 October 2026
+
+The pilot in `notes/06-simulation-findings.md` failed the pre-registered effective-sample-size comparison for the finite-difference proposal. The invariance argument in Section 5.5 is unchanged. The proposal is not carried forward as a method. See "Dropped".
+
 ## Dropped
 
 - A theorem that a KD-tree changes the invariant distribution. Not claimed. Same neighbours give the same kernel. Different deterministic neighbours keep the target if stage two evaluates it.
@@ -180,3 +184,4 @@ Will appear in the paper. The account and the cells that were measured. No curve
 - Convergence of the surrogate-weight algorithm in the sense of Chopin, Jacob and Papaspiliopoulos, Proposition 1. Not claimed.
 - The thresholds \(d_\theta < 10\) and \(d_y > 10\) as a theorem. Not claimed.
 - A general proof that the Rao-Blackwellised filter is worth its cost. Not claimed. The linear Gaussian identity says that, in that case, it is not.
+- The finite-difference Langevin proposal as a method to be used. The acceptance ratio in Section 5.5 still leaves \(\hat{\pi}_{\mathrm{enkf}}\) invariant. The pilot's pre-registered comparison, effective sample size per transition draw, went against the proposal. It is not part of the recommended algorithm.
