@@ -1,0 +1,30 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage[margin=2.5cm]{geometry}
+
+\title{Extensions of a nested ensemble Kalman filter}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+State-space models with a static parameter and a latent process make the observed-data likelihood an integral over a path. Nested particle filters estimate the successive parameter posteriors, but a particle likelihood becomes expensive as the observation dimension grows. An ensemble Kalman filter replaces that likelihood by a Gaussian forecast approximation and can be nested in the same outer recursion. We study how the resample-move step can be screened, switched and, if a different target is acceptable, weighted by a nearest-neighbour surrogate. On a linear Gaussian pilot, an exact tree returns the same neighbours as a list and evaluates fewer distances. A rule that uses plain Metropolis--Hastings while the series is short, and delayed acceptance afterwards, has a lower cost per accepted move than either kernel alone. Using the surrogate as the weight cuts the number of transition draws and increases the error in the posterior means. A Rao-Blackwellised correction leaves the weight unchanged when the observation model is already the linear Gaussian model inside the filter. A finite-difference Langevin proposal does not improve the effective sample size per draw. The comparison is a small Ornstein--Uhlenbeck pilot with a known likelihood.
+\end{abstract}
+
+\noindent\textbf{Keywords:} delayed acceptance, Ornstein--Uhlenbeck process, Rao-Blackwellisation, sequential Monte Carlo, surrogate likelihood
+
+\input{sections/introduction}
+\input{sections/related}
+\input{sections/methods}
+\input{sections/simulation}
+\input{sections/discussion}
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\end{document}

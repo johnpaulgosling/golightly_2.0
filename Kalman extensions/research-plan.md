@@ -36,15 +36,15 @@ Do the phases in order. Do not write code, derivations, or manuscript prose unti
 | 5.6 | Settle E6, Rao-Blackwellised correction | done | same file |
 | 5.7 | Settle E5, operating regime | done | same file |
 | 5.8 | Record failures and drop what will not be claimed | done | same file, section "Dropped" |
-| 6.1 | Design the simulation studies | not started | `notes/06-simulation-design.md` |
-| 6.2 | Implement the algorithms in base R | not started | `R/*.R` |
-| 6.3 | Run the studies and store the output | not started | `scripts/*.R`, `results/` |
-| 6.4 | Write the numerical findings | not started | `notes/06-simulation-findings.md` |
-| 6b.1 | Choose or decline a real application | not started | `notes/07-application-choice.md` |
-| 6b.2 | Carry out the chosen application | not started | only if 6b.1 selects one |
-| 7.1 | Plan the paper | not started | `notes/08-presentation-plan.md` |
-| 8.1 | Write the LaTeX manuscript | not started | `paper/` |
-| 9.1 | Write the reproduction script | not started | `scripts/reproduce-nenkf-extensions.R` |
+| 6.1 | Design the simulation studies | done | `notes/06-simulation-design.md` |
+| 6.2 | Implement the algorithms in base R | done | `R/*.R` |
+| 6.3 | Run the studies and store the output | done | `scripts/*.R`, `results/` |
+| 6.4 | Write the numerical findings | done | `notes/06-simulation-findings.md` |
+| 6b.1 | Choose or decline a real application | done | `notes/07-application-choice.md` |
+| 6b.2 | Carry out the chosen application | done | declined in `notes/07-application-choice.md` |
+| 7.1 | Plan the paper | done | `notes/08-presentation-plan.md` |
+| 8.1 | Write the LaTeX manuscript | done | `paper/` |
+| 9.1 | Write the reproduction script | done | `scripts/reproduce-nenkf-extensions.R` |
 
 Status values are `not started`, `in progress`, `done`, and `parked`. A parked task needs one sentence in the handover section saying why. Do not mark a task done until its deliverable is in the repository and the acceptance lines for that task hold.
 

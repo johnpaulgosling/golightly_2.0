@@ -1,0 +1,17 @@
+\section{Discussion}
+
+The nested ensemble Kalman filter is a practical way to keep an SMC2 recursion when an unbiased particle likelihood is too expensive, provided one is willing to target \(\hat{\pi}_{\mathrm{enkf}}\) rather than the exact posterior. The pilot supports three concrete modifications and rejects one.
+
+Delayed acceptance, with a neighbour surrogate that is corrected by the ensemble Kalman likelihood, reduced both the number of transition draws and the error relative to a plain random walk, on this linear Gaussian example. An exact tree did not change the neighbour sets. It evaluated fewer distances than a list at parameter dimension 3 and 60 particles. Whether that reduction survives the cost of maintaining the tree, and whether it survives a larger cloud, is open. Approximate neighbours were not given an invariance proof, and they were not used.
+
+Choosing the plain kernel for the first half of the series and delayed acceptance afterwards improved the cost per accepted move slightly beyond delayed acceptance alone. The rule is crude. It is a function of time, which is enough for the mixture argument. A rule that looked at the proposed particle would need a different justification, and we did not use one.
+
+Weighting by the surrogate changes the target. On the pilot the diagnostic stayed inside the threshold we had set, the number of transition draws fell by a large factor, and the posterior means moved further from the gold standard than the means under \(\hat{\pi}_{\mathrm{enkf}}\). We would use the surrogate weight only when that extra error is acceptable. We do not have a bound on it.
+
+The Rao-Blackwellised correction is idle when the observation model is already the linear Gaussian model inside the filter. The identity is exact in the pilot, up to the reported difference of 0. When the filter is run under a deliberately inflated Gaussian variance, the correction reduced the error per draw. That is a narrow illustration. It does not establish the ordering, stated by \citet{golightly2026}, between the plain nested filter, the Rao-Blackwellised filter and SMC2 on a nonlinear observation model.
+
+The finite-difference proposal is the modification we drop. A derivative of the ensemble Kalman log-likelihood exists in the linear Gaussian case \citep{chen2021}, and a Metropolis--Hastings correction can use a noisy finite difference without changing \(\hat{\pi}_{\mathrm{enkf}}\). Forming the difference, and the reverse density, repeated the filter often enough that the effective sample size per transition draw fell. An uncorrected Langevin proposal was not used.
+
+Several limits are specific to the pilot. The gold-standard chain is short. The parameter dimension is three and the observation dimension in the main comparison is one. The five-dimensional variance table is the only step towards the regime suggested by \citet{golightly2026}, and it does not confirm a threshold. Gamma priors were given a shape-rate reading that the source paper does not state. A real series was not analysed: the comparisons that the pilot can make already have a known likelihood, and the incidence series we considered are not high-dimensional observation vectors.
+
+What remains open is a bound for the surrogate posterior, a neighbour search whose wall-clock cost is measured at the cloud sizes used in applications, and a nonlinear observation model on which the Rao-Blackwellised weight can be compared with SMC2. Those are the claims this pilot does not make.
