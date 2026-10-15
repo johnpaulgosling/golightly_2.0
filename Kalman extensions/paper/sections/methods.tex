@@ -1,0 +1,55 @@
+\section{Methods}
+\label{sec:methods}
+
+The observation model in the linear Gaussian case is
+\begin{equation}
+\label{eq:obs}
+f_t^{(\theta)}(y_t \mid x_t) = \mathcal{N}(y_t; Hx_t, R).
+\end{equation}
+An ensemble of size \(N\) is propagated by the state transition. The forecast mean \(\hat{\mu}_{t\mid t-1}\) and covariance \(\hat{\Sigma}_{t\mid t-1}\) are the sample moments, with divisor \(N-1\). The ensemble Kalman likelihood contribution is
+\begin{equation}
+\label{eq:enkf-lik}
+\hat{p}_{\mathrm{enkf},t}^{(\theta)}(y_t \mid y_{0:t-1})
+  = \mathcal{N}\bigl(y_t; H\hat{\mu}_{t\mid t-1},\, H\hat{\Sigma}_{t\mid t-1}H^{\top}+R\bigr).
+\end{equation}
+This contribution is exact for the Gaussian forecast approximation and is not unbiased for the true predictive density. The product of these contributions, multiplied by the prior, defines \(\hat{\pi}_{\mathrm{enkf},t}\) up to the ensemble randomness carried by the extended target \citep[Section~4.1]{golightly2026}.
+
+\subsection{Nested filter}
+
+The outer recursion follows Algorithm~6 of \citet{golightly2026}. At time \(t\), each parameter particle is updated by one ensemble Kalman step and its weight is multiplied by \eqref{eq:enkf-lik}. If the effective sample size is at least \(\gamma M\), the cloud is left as it is. Otherwise the particles are resampled with replacement, the weights are reset to \(1/M\), and each particle is offered one Metropolis--Hastings proposal. The proposal is a random walk whose covariance is \(\zeta\) times the sample covariance of the other resampled particles. The acceptance ratio uses the prior and the ensemble Kalman likelihood of the series so far, and the likelihood at a proposed value is obtained by rerunning the filter from the known initial condition. In the pilot, \(\zeta^{2} = 2.56^{2}/d_{\theta}\) and the ensemble size is held fixed.
+
+The printed Algorithm~6 places the effective-sample-size test inside the particle loop. The surrounding text applies one resample-move step when the effective sample size of the updated cloud falls below \(\gamma M\). We follow the surrounding text: the weight update is completed for every particle, and the test is applied once.
+
+\subsection{Delayed acceptance and the neighbour search}
+
+The screen replaces both ensemble Kalman likelihoods in the acceptance ratio by an inverse-distance average of the \(k\) nearest stored log-likelihoods \citep[Section~4.2]{golightly2026}. If the screen accepts, a second ratio corrects back to the ensemble Kalman likelihood. The product of the two ratios is the plain Metropolis--Hastings ratio, so the kernel leaves the extended ensemble Kalman target invariant under the conditions of \citet{christen2005}. The distance in \citet{golightly2026} is described as some metric. The pilot uses Euclidean distance on \(\log\theta\), after standardising each coordinate by the standard deviation of the stored cloud.
+
+A linear scan and an exact KD-tree that return the same neighbours produce the same surrogate and therefore the same kernel. A different deterministic neighbour set changes the kernel. Provided the surrogate is positive wherever the proposal is positive, the second stage still leaves the ensemble Kalman target invariant, because that stage evaluates the ensemble Kalman likelihood. The pilot uses exact neighbours. At this size the comparison is the number of distances evaluated by the tree and by the list. The tree is rebuilt on every query, so the comparison is a count of distances rather than a wall-clock time.
+
+\subsection{A switch that depends only on time}
+
+While \(t\) is small the ensemble Kalman likelihood is a short filter, and a screen saves little. The pilot rule uses plain Metropolis--Hastings when \(t \le 8\) and delayed acceptance with \(k = 3\) when \(t > 8\), on a series of length 16. The choice is a function of \(t\) only and is made before the proposal. Each kernel preserves \(\hat{\pi}_{\mathrm{enkf},t}\), and a mixture of kernels with the same invariant distribution preserves that distribution. The argument does not require the unbiased likelihood of \citet{chopin2012}, and it does not use the particle Gibbs kernel of \citet{botha2023}.
+
+The criterion was fixed before any output was seen. It is the number of transition draws used inside rejuvenation, divided by the number of accepted proposals. The same two ingredients, the relative cost of the cheap approximation and the stage-two acceptance rate, appear in the efficiency calculations of \citet{sherlock2021}. Their high-dimensional diffusion limit is a separate calculation, and it is not used here.
+
+\subsection{Surrogate incremental weights}
+
+If the incremental weight is the nearest-neighbour prediction of \eqref{eq:enkf-lik}, the weights target
+\begin{equation}
+\label{eq:knn-target}
+\pi_{\mathrm{knn},t}(\theta) \propto \pi(\theta)\, \exp\bigl(\ell_{\mathrm{knn},t}(\theta)\bigr),
+\end{equation}
+conditional on the stored cloud that defines \(\ell_{\mathrm{knn},t}\). This is neither \(\hat{\pi}_{\mathrm{enkf},t}\) nor the exact posterior. Equation~\eqref{eq:enkf-lik} already differs from the true likelihood, and the surrogate differs again from \eqref{eq:enkf-lik}.
+
+In the pilot the first \(k\) particles form a reference set and are always updated with the ensemble Kalman filter. Every other particle takes the inverse-distance prediction of the reference increments and does not run a forecast for that weight. After resampling, the reference slots are re-evaluated, so that the screen is built from ensemble Kalman likelihoods. A proposal that passes the screen is still evaluated with the ensemble filter. No bound is available on the distance between \(\pi_{\mathrm{knn},t}\) and \(\hat{\pi}_{\mathrm{enkf},t}\). The diagnostic was also fixed in advance. At the terminal time it recomputes \eqref{eq:enkf-lik} for eight non-reference particles. The surrogate was to be called a poor approximation of the ensemble Kalman increment if the mean, over replicates, of the median absolute log difference exceeded 1.
+
+\subsection{Rao-Blackwellised weight}
+
+For a general observation density \(f\), the filter can still be run under a linear Gaussian approximation \(g\). The Rao-Blackwellised increment averages, over the analysis ensemble, the terms
+\begin{equation}
+\label{eq:rb}
+\hat{g}_{\mathrm{enkf},t}^{(\theta)}(y_t)\, \frac{f_t^{(\theta)}(y_t \mid x_t^{j})}{g_t^{(\theta)}(y_t \mid x_t^{j})}.
+\end{equation}
+The parameter target induced by these increments is denoted \(\tilde{\pi}_{\mathrm{enkf},t}\). If \(f = g\), each ratio equals 1 and \eqref{eq:rb} reduces to \eqref{eq:enkf-lik}. The correction then leaves both the target and the estimate unchanged. The identity is for this linear Gaussian case. It does not by itself describe a nonlinear observation model.
+
+The comparison fixed before the runs is the absolute error in the posterior means of \(\log\theta_i\), per transition draw. The Rao-Blackwellised filter is preferred on that criterion when the ratio is smaller than the ratio for the plain filter run under the same \(g\). When \(f = g\), the identity shows that the correction cannot reduce the error.

@@ -1,0 +1,75 @@
+\section{Simulation studies}
+\label{sec:sim}
+
+The latent process is the scalar Ornstein--Uhlenbeck diffusion in Section~5.1 of \citet{golightly2026},
+\[
+\mathrm{d}X_t = \theta_1(\theta_2 - X_t)\,\mathrm{d}t + \theta_3\,\mathrm{d}W_t,
+\]
+with the Gaussian transition printed there. The truth is \(\theta = (1, 2, 1)\), the initial condition is \(x_0 = 10\), and observations at times \(1, \ldots, 16\) follow \eqref{eq:obs} with \(H = 1\) and \(R = 0.1\). The prior is independent, with \(\theta_1 \sim \mathrm{Gamma}(2, 2)\), \(\theta_2 \sim \mathrm{Gamma}(5, 3)\) and \(\theta_3 \sim \mathrm{Gamma}(2, 5)\), in the shape-rate parameterisation. The source paper writes \(\mathrm{Gamma}(a, b)\) and does not name the parameterisation. All series below were simulated from this model, and all algorithms were coded in base R.
+
+The nested filter uses \(M = 60\), \(N = 12\), \(\gamma = 0.4\) and \(k = 3\). The ensemble size does not adapt. Four replicate series are used. The gold standard for each series is a random-walk Metropolis--Hastings chain on \(\log\theta\), targeting the exact Kalman likelihood, with 3000 iterations after a burn-in of 1000 and with proposal standard deviation 0.15. That chain is much shorter than the \(10^{6}\) iterations used by \citet{golightly2026}, and \(M\), \(T\) and \(N\) are smaller than in their Section~5.1. The posterior means from the pilot should be read with that Monte Carlo error in mind.
+
+The reported error is the absolute difference, averaged over the three coordinates of \(\log\theta\), between the weighted filter mean and the gold-standard mean. Cost is the number of transition draws. Tables~\ref{tab:s2}--\ref{tab:s6} report means over the four replicates.
+
+\begin{table}[t]
+\centering
+\caption{Ornstein--Uhlenbeck pilot. Kernel comparison, with means over four replicates. Cost per acceptance is the number of rejuvenation transition draws divided by the number of accepted proposals. ESS denotes the effective sample size.}
+\label{tab:s2}
+\begin{tabular}{lrrrr}
+\hline
+Kernel & Abs.\ error & Draws & Cost per acceptance & ESS \\
+\hline
+Metropolis--Hastings & 0.172 & 33855 & 310.4 & 39.6 \\
+Delayed acceptance & 0.126 & 23970 & 221.6 & 43.3 \\
+Switch at \(t = 8\) & 0.132 & 23457 & 214.7 & 36.7 \\
+\hline
+\end{tabular}
+\end{table}
+
+On the pre-registered criterion the switch has the lowest cost per accepted move. Delayed acceptance is close to the switch and is cheaper per acceptance than the plain random walk, and its absolute error is the smallest of the three. The neighbour sets from the list and the tree agreed on every check, 491 checks per replicate on average. The list evaluated a distance to 29460 stored points on average and the tree to 13422.5. Because the neighbour sets agree, the two searches define the same kernel on these runs. The tree evaluates fewer distances at this size. The count does not include the cost of building the tree.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/cost-error.pdf}
+\caption{Ornstein--Uhlenbeck pilot. Mean absolute error in the posterior means of \(\log\theta_i\) against the mean number of transition draws, over four replicates. The finite-difference proposal is included for comparison with the random walk.}
+\label{fig:cost}
+\end{figure}
+
+Figure~\ref{fig:cost} places the runs of Table~\ref{tab:s2} on one scale, together with the surrogate-weight filter and the finite-difference proposal. The finite-difference proposal had mean absolute error 0.074 and mean transition draws 268602, against 0.172 and 33855 for the random walk. Effective sample size per transition draw was 0.000148, against 0.00123 for the random walk. The smaller error does not offset the extra draws under the pre-registered comparison, so the proposal is not taken forward. The acceptance probability included the Gaussian proposal density. The comparison is therefore one of cost for a kernel that still leaves \(\hat{\pi}_{\mathrm{enkf}}\) invariant.
+
+The surrogate-weight filter used 5217 transition draws on average. The mean, over replicates, of the median absolute log difference between the surrogate increment and a fresh ensemble Kalman increment was 0.277, below the threshold of 1. The mean absolute error was 0.293, which is larger than the error of the plain filter and of delayed acceptance. Most of the saving comes from particles that do not run a forecast. The target is \eqref{eq:knn-target}, so the larger error is the discrepancy between that target and \(\hat{\pi}_{\mathrm{enkf}}\).
+
+\begin{table}[t]
+\centering
+\caption{Ornstein--Uhlenbeck pilot. Sample variance of the log ensemble Kalman likelihood at the true parameter, from 20 independent ensembles.}
+\label{tab:s5}
+\begin{tabular}{rrrr}
+\hline
+\(d_y\) & \(N\) & Variance & Mean draws \\
+\hline
+1 & 8 & 14.060 & 128 \\
+1 & 16 & 2.879 & 256 \\
+5 & 8 & 24.935 & 640 \\
+5 & 16 & 10.661 & 1280 \\
+\hline
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:s5} is the scaling comparison that the pilot can support. The five-dimensional series consists of five independent copies of the same diffusion, observed with independent noise. Doubling \(N\) reduces the variance for both observation dimensions. The variance does not fall in proportion to the ratio of those dimensions. Proposition~2 of \citet{katzfuss2018} concerns an example with independent draws from the true forecast. The ensemble used here is interacting, and the reported log-likelihood is a sum over the series. The four cells do not support a boundary at parameter dimension 10 or at observation dimension 10.
+
+\begin{table}[t]
+\centering
+\caption{Ornstein--Uhlenbeck pilot. Rao-Blackwellised weights. The identity row uses \(R_g = R = 0.1\). The other two rows use \(R_g = 0.5\), whilst the data and the gold standard use \(R = 0.1\). Error per draw is the ratio of the mean absolute error to the mean number of draws.}
+\label{tab:s6}
+\begin{tabular}{lrrr}
+\hline
+Filter & Abs.\ error & Draws & Error per draw \\
+\hline
+Plain, \(R_g = 0.5\) & 0.369 & 22776 & \(1.62 \times 10^{-5}\) \\
+Rao-Blackwellised, \(R_g = 0.5\) & 0.169 & 36069 & \(4.68 \times 10^{-6}\) \\
+Rao-Blackwellised, \(R_g = 0.1\) & 0.121 & 31248 & \(3.87 \times 10^{-6}\) \\
+\hline
+\end{tabular}
+\end{table}
+
+When \(R_g = R\), the log ensemble Kalman increment and the log Rao-Blackwellised increment agreed on every replicate: the maximum absolute difference was 0. The correction does not change the weight in that case. When \(R_g = 0.5\) and the true observation variance is 0.1, both densities are Gaussian and \(f \ne g\). The Rao-Blackwellised filter then has the smaller error per draw, at a higher number of transition draws. The comparison uses two Gaussian variances. It is not a nonlinear observation model, and SMC2 was not run on the same series.
