@@ -66,3 +66,13 @@ Section list:
 5. Discussion: what S7 showed, the missing bound, and the extensions that are not claimed.
 
 The word budget remains at or under 8000 words. The numerical section is the identity, the diagnostic and one Lotka–Volterra table.
+
+## Amendment, 15 October 2026. Standalone manuscript
+
+This amendment replaces the instruction that the draft should stay short, and the instruction that there is no schematic. The manuscript is a standalone paper. It does not cite notes, result files, seeds stored in the repository, or runs that are not part of the claim.
+
+- Figure of the four parameter targets, with the two errors marked.
+- Figure of one Lotka–Volterra observation update, with the plain increment, the Rao-Blackwellised increment and bootstrap SMC2.
+- Figure of mean absolute error against transition draws for the Ornstein–Uhlenbeck checks.
+- Figure of the Lotka–Volterra differences from SMC2, with the standard-error bars.
+- The linear Gaussian discrepancy cell and the surrogate-weight error are reported as experiments of the paper, with the settings written out. They are not pointers to a results file.

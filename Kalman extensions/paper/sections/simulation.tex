@@ -1,48 +1,119 @@
 \section{Simulation studies}
 \label{sec:sim}
 
-Two checks are reported. The first is the linear Gaussian identity, on the Ornstein--Uhlenbeck pilot already stored in the results files. The second is the Lotka--Volterra comparison of Section~5.2 of \citet{golightly2026}, at the reduced settings fixed before the run. All algorithms were coded in base R and the Lotka--Volterra runs used R~4.3.3 on an Intel Xeon processor. The pilot is not a reproduction of the 2026 tables.
+Two comparisons are reported. The first is linear and Gaussian. It checks Lemma~\ref{lem:identity}, illustrates the Rao-Blackwellised weight when the observation variance inside the filter is wrong, and measures the nearest-neighbour weight of Section~\ref{sec:knn}. The second is the Lotka--Volterra comparison of the plain filter, the Rao-Blackwellised filter and bootstrap SMC2. All algorithms were coded in R. The Lotka--Volterra runs used R~4.3.3 on an Intel Xeon processor.
 
-\subsection{Identity and the surrogate diagnostic}
+The linear Gaussian runs use fewer parameter particles, a shorter series and a shorter gold-standard chain than Section~5.1 of \citet{golightly2026}. The Lotka--Volterra runs use fewer parameter particles, a fixed ensemble size and fewer replicates than Section~5.2 of that paper, and they do not use the particle Markov chain Monte Carlo reference used there. The numbers below are not a reproduction of those tables. Settings that the source paper leaves unspecified are stated here and were fixed before the runs.
 
-The identity check uses the scalar Ornstein--Uhlenbeck diffusion of Section~5.1 of \citet{golightly2026}, with \(M = 60\) parameter particles, 16 observations, a fixed ensemble of size 12 and four replicate series. The gold-standard chain on each series has 3000 iterations after a burn-in of 1000. Those choices are smaller than Section~5.1. When the observation variance inside the filter equals the observation variance of the data, \(R_g = R = 0.1\), the log ensemble Kalman increment and the log Rao-Blackwellised increment agree. The maximum absolute difference on each replicate is 0. Lemma~\ref{lem:identity} is the corresponding statement. The correction does not change the weight in this case, and the extra density evaluations have nothing to correct.
+\subsection{Linear Gaussian checks}
+\label{sec:ou}
 
-The same pilot records the surrogate diagnostic. The mean, over four replicates, of the median absolute difference between a nearest-neighbour increment and a fresh ensemble Kalman increment is 0.277. The threshold fixed before the run was 1. The diagnostic stays inside that threshold. It is not a uniform bound on the log-likelihood, and it is not substituted into the total-variation calculation of Section~\ref{sec:methods}.
+The latent process is the scalar Ornstein--Uhlenbeck diffusion of Section~5.1 of \citet{golightly2026},
+\begin{equation}
+\label{eq:ou}
+\mathrm{d}X_t = \theta_1(\theta_2 - X_t)\, \mathrm{d}t + \theta_3\, \mathrm{d}W_t,
+\end{equation}
+with exact Gaussian transition. Over a step of length \(\Delta t\) the mean is \(x e^{-\theta_1 \Delta t} + \theta_2(1-e^{-\theta_1 \Delta t})\) and the variance is \(\theta_3^{2}(1-e^{-2\theta_1 \Delta t})/(2\theta_1)\). We take \(\Delta t = 1\), truth \(\theta = (1, 2, 1)^{\top}\) and \(x_0 = 10\). Sixteen observations are generated at times \(1, \ldots, 16\), with \(H = 1\) and \(R = 0.1\). There is no observation at time 0. The initial condition and \(R\) are treated as known. The prior is independent, \(\theta_1 \sim \mathrm{Gamma}(2, 2)\), \(\theta_2 \sim \mathrm{Gamma}(5, 3)\) and \(\theta_3 \sim \mathrm{Gamma}(2, 5)\), in the shape-rate parameterisation. \citet{golightly2026} write \(\mathrm{Gamma}(a, b)\) and do not name the parameterisation. We use the same reading throughout.
 
-The pilot also compared an exact tree with a list and a time-based kernel switch with two fixed kernels, and it compared a finite-difference proposal with a random walk. Those runs are not part of the claim.
+Each filter uses \(M = 60\) parameter particles, a fixed ensemble of size \(N = 12\) and \(\gamma = 0.4\). Four replicate series are used. The reference on each series is a random-walk Metropolis--Hastings chain on \(\log\theta\), targeting the exact Kalman likelihood times the prior, with independent proposal standard deviation 0.15 on each log-coordinate. The chain has 3000 iterations after a burn-in of 1000. The posterior mean of \(\log\theta_i\) from the post-burn-in sample is the reference value. This chain is much shorter than the run of \(10^{6}\) iterations in Section~5.1 of \citet{golightly2026}, and its Monte Carlo error remains in every absolute error below.
+
+The reported error is the mean, over the four series and over the three log-parameters, of the absolute difference between the terminal weighted posterior mean and the reference value. Transition draws count model integrations.
+
+\paragraph{Identity.}
+When the observation variance inside the filter equals the observation variance of the data, \(R_g = R = 0.1\), the log ensemble Kalman increment and the log Rao-Blackwellised increment agree. The maximum absolute difference, over particles and times, is 0 on each of the four replicates. Lemma~\ref{lem:identity} is the corresponding statement. The correction does not change the weight, and the extra density evaluations have nothing to correct. The mean absolute error of this run against the short reference chain is 0.121, from 31248 transition draws. That figure is the error of the ensemble Kalman posterior at this particle count. It is not an error of the Rao-Blackwellised correction.
+
+\paragraph{Wrong observation variance.}
+The data and the reference chain still use \(R = 0.1\). The filter uses \(g = \mathcal{N}(y; x, 0.5)\), so \(f\) and \(g\) are both linear and Gaussian and they are not equal. The plain filter, which targets \(\hat{\pi}_{\mathrm{enkf}}\) under this \(g\), has mean absolute error 0.369 from 22776 transition draws. The Rao-Blackwellised filter, which uses the same \(g\) and then multiplies by \(f/g\), has mean absolute error 0.169 from 36069 transition draws. The correction reduces the error in the posterior means and spends additional transition draws to do so. The ordering is an illustration on this series. It is not a general rule, and it is not the nonlinear observation of Section~\ref{sec:lv}. Panel~(b) of Figure~\ref{fig:ou} shows the two points.
+
+\paragraph{Surrogate weight.}
+The reference set has \(k = 3\) particles, and the neighbour metric is Euclidean distance on \(\log\theta\) after each coordinate has been scaled by the standard deviation of that coordinate in the stored cloud. A coordinate with standard deviation 0 is left unscaled. At the terminal time, \eqref{eq:enkf-lik} is recomputed for eight non-reference particles. The surrogate increment was to be called a poor approximation of the ensemble Kalman increment if the mean, over the four series, of the median absolute log difference exceeded 1. That threshold means a typical stored comparison differs by more than a factor of \(e\). The mean of the median absolute log differences is 0.277. The diagnostic stays inside the threshold. It is not a uniform bound on the log-likelihood, and it is not substituted into \eqref{eq:tv}.
+
+Table~\ref{tab:ou} and panel~(a) of Figure~\ref{fig:ou} compare the surrogate weight with two filters that target \(\hat{\pi}_{\mathrm{enkf}}\). The plain filter uses a Metropolis--Hastings rejuvenation and the ensemble Kalman weight. Delayed acceptance uses the neighbour average as a screen only, with the same \(k = 3\), and evaluates the ensemble Kalman likelihood at the second stage. The surrogate-weight run uses the construction in Section~\ref{sec:knn}: non-reference weights are predictions, and the move still corrects the screen. The mean absolute errors are 0.172, 0.126 and 0.293, from 33855, 23970 and 5217 transition draws. The two schemes that target \(\hat{\pi}_{\mathrm{enkf}}\) have the smaller errors. The surrogate weight uses fewer transition draws than either of them, and its error is larger. The drop from 33855 draws to 23970 is the screen, which leaves \(\hat{\pi}_{\mathrm{enkf}}\) invariant. The further drop to 5217 is the replacement of most incremental weights by the surrogate, which is the second error.
+
+\begin{table}[htbp]
+\centering
+\caption{Ornstein--Uhlenbeck series. Mean absolute error of the terminal weighted posterior means of \(\log\theta_i\), and mean number of transition draws, over four replicate series. The plain filter and delayed acceptance target \(\hat{\pi}_{\mathrm{enkf}}\). The surrogate weight targets \(\pi_{\mathrm{knn}}\) on the non-reference particles.}
+\label{tab:ou}
+\begin{tabular}{lrr}
+\toprule
+Scheme & Mean absolute error & Transition draws \\
+\midrule
+Plain filter & 0.172 & 33855 \\
+Delayed acceptance & 0.126 & 23970 \\
+Surrogate weight & 0.293 & 5217 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{ou-accuracy-cost.pdf}
+\caption{Ornstein--Uhlenbeck series. Mean absolute error against mean transition draws. (a)~Three schemes on the correctly specified observation variance. The plain filter and delayed acceptance target \(\hat{\pi}_{\mathrm{enkf}}\). The surrogate weight does not. (b)~Plain and Rao-Blackwellised filters when the observation variance inside the filter is 0.5 and the data use variance 0.1.}
+\label{fig:ou}
+\end{figure}
 
 \subsection{Lotka--Volterra targets}
 \label{sec:lv}
 
-The latent process is the prey--predator diffusion (25) of \citet{golightly2026}, with drift
-\[
+The latent process is the prey--predator diffusion \eqref{eq:lv-sde} of \citet[Section~5.2]{golightly2026},
+\begin{equation}
+\label{eq:lv-sde}
+\mathrm{d}X_t = a(X_t, \theta)\, \mathrm{d}t + b(X_t, \theta)^{1/2}\, \mathrm{d}W_t,
+\end{equation}
+with drift
+\begin{equation}
+\label{eq:lv-drift}
 a(x, \theta)
   = \bigl(\theta_1 x_1 - \theta_2 x_1 x_2,\ 
           \theta_2 x_1 x_2 - \theta_3 x_2\bigr)
-\]
-and with the diffusion matrix printed in that section. The observation model is (27): the prey component is observed with a Gaussian density whose mean and variance both equal that component, and the predator component is latent. The truth is \(x_0 = (50, 50)^{\top}\) and \(\theta = (0.5, 0.0025, 0.3)^{\top}\). The prior is independent, \(\theta_1 \sim \mathrm{Gamma}(2, 4)\), \(\theta_2 \sim \mathrm{Gamma}(20, 10^{4})\) and \(\theta_3 \sim \mathrm{Gamma}(2, 4)\), in the shape-rate parameterisation. The source paper writes \(\mathrm{Gamma}(a, b)\) and does not name the parameterisation.
+\end{equation}
+and diffusion matrix
+\begin{equation}
+\label{eq:lv-diff}
+b(x, \theta)
+  =
+  \begin{pmatrix}
+    \theta_1 x_1 + \theta_2 x_1 x_2 & -\theta_2 x_1 x_2 \\
+    -\theta_2 x_1 x_2 & \theta_2 x_1 x_2 + \theta_3 x_2
+  \end{pmatrix}.
+\end{equation}
+The observation model is Gaussian with mean and variance both equal to the prey component, and the predator component is latent. In the notation of \eqref{eq:obs}, \(H = (1, 0)\) and the variance is \(Hx_t\) rather than a constant matrix. Figure~\ref{fig:increment} is this update. The truth is \(x_0 = (50, 50)^{\top}\) and \(\theta = (0.5, 0.0025, 0.3)^{\top}\). The prior is independent, \(\theta_1 \sim \mathrm{Gamma}(2, 4)\), \(\theta_2 \sim \mathrm{Gamma}(20, 10^{4})\) and \(\theta_3 \sim \mathrm{Gamma}(2, 4)\), again in the shape-rate parameterisation.
 
-The synthetic path uses Euler--Maruyama with time step \(10^{-3}\) on \([0, 40]\) and is thinned by 2000. Twenty prey observations are kept, at times \(2, 4, \ldots, 40\). The initial condition is treated as known. Inside each filter the transition between observations is ten Euler steps of length 0.2. A coordinate below \(10^{-6}\) is replaced by \(10^{-6}\). The source paper does not state a boundary rule.
+The synthetic path uses Euler--Maruyama with time step \(10^{-3}\) on \([0, 40]\) and is thinned by 2000. Twenty prey observations are kept, at times \(2, 4, \ldots, 40\). The initial condition is treated as known and is not an observation. Inside each filter the transition between observations is ten Euler steps of length 0.2. The diffusion matrix \eqref{eq:lv-diff} is a covariance for positive states. After every Euler draw, and after every ensemble Kalman analysis update, a coordinate below \(10^{-6}\) is replaced by \(10^{-6}\). \citet{golightly2026} do not state a boundary rule.
 
-Three filters are run on this one series, with four algorithm replicates. The plain nested filter uses \(\tilde{R} = H\hat{\mu}_{t\mid t-1}\) and targets \(\hat{\pi}_{\mathrm{enkf}}\). The Rao-Blackwellised filter multiplies that variance by 2, evaluates \eqref{eq:rb}, and targets \(\tilde{\pi}_{\mathrm{enkf}}\). Bootstrap SMC2 uses the Euler--Maruyama transition as its proposal and the observation density (27) as its state weight. For that discretisation its parameter target is \(\pi_t\). Each filter uses \(M = 60\) and \(\gamma = 0.4\). The ensemble size is fixed at \(N = 12\) for the first two filters. SMC2 uses 24 state particles. There is no delayed acceptance and no growth of \(N\). The rejuvenation proposal is one random walk, with \(\zeta^{2} = 2.56^{2}/3\). Section~5.2 of \citet{golightly2026} used \(M = 1000\), an ensemble that starts at 20 and then grows, 50 replicates, delayed acceptance with three neighbours, and a particle Markov chain Monte Carlo gold standard of \(10^{6}\) iterations. None of those settings is used here. SMC2 is the reference for \(\pi_t\), and it is a noisy one at this state-particle count.
+Three filters are run on this one series, with four algorithm replicates. The plain nested filter uses \(\tilde{R} = H\hat{\mu}_{t\mid t-1}\) and targets \(\hat{\pi}_{\mathrm{enkf}}\). The Rao-Blackwellised filter multiplies that variance by 2, evaluates \eqref{eq:rb}, and targets \(\tilde{\pi}_{\mathrm{enkf}}\). Bootstrap SMC2 uses the Euler--Maruyama transition as its proposal and the observation density as its state weight. For that discretisation its parameter target is \(\pi_t\). Each filter uses \(M = 60\) and \(\gamma = 0.4\). The ensemble size is fixed at \(N = 12\) for the first two filters. SMC2 uses 24 state particles. There is no delayed acceptance and no growth of \(N\). The rejuvenation proposal is one random walk, with \(\zeta^{2} = 2.56^{2}/3\). Section~5.2 of \citet{golightly2026} used \(M = 1000\), an ensemble that starts at 20 and then grows, 50 replicates, delayed acceptance with three neighbours, and a particle Markov chain Monte Carlo reference of \(10^{6}\) iterations with 100 state particles. None of those settings is used here. SMC2 is the reference for \(\pi_t\), and it is a noisy one at this state-particle count.
 
-The reported summary is the terminal weighted mean of \(\log\theta_j\). Table~\ref{tab:lv} gives the average of that summary over the four replicates, with the replicate standard deviation in parentheses.
+The reported summary is the terminal weighted mean of \(\log\theta_j\). Table~\ref{tab:lv} gives the average of that summary over the four replicates, with the replicate standard deviation in parentheses. Figure~\ref{fig:lv} plots the difference of each nested filter from SMC2.
 
-\begin{table}[t]
+\begin{table}[htbp]
 \centering
-\caption{Lotka--Volterra comparison. Mean, over four algorithm replicates, of the terminal weighted posterior mean of \(\log\theta_j\), with the replicate standard deviation in parentheses. Draws are the mean number of Euler steps.}
+\caption{Lotka--Volterra comparison. Mean, over four algorithm replicates, of the terminal weighted posterior mean of \(\log\theta_j\), with the replicate standard deviation in parentheses. Draws are the mean number of Euler steps. Effective sample size is the mean terminal effective sample size.}
 \label{tab:lv}
-\begin{tabular}{lrrr r r}
-\hline
+\begin{tabular}{lrrrrr}
+\toprule
 Filter & \(\log\theta_1\) & \(\log\theta_2\) & \(\log\theta_3\) & ESS & Draws \\
-\hline
+\midrule
 Plain & $-0.714$ $(0.122)$ & $-6.035$ $(0.104)$ & $-1.276$ $(0.101)$ & 33.3 & 448500 \\
 Rao-Blackwellised & $-0.852$ $(0.084)$ & $-5.971$ $(0.159)$ & $-1.196$ $(0.156)$ & 42.6 & 476100 \\
 SMC2 & $-0.837$ $(0.064)$ & $-5.977$ $(0.138)$ & $-1.241$ $(0.161)$ & 43.5 & 905700 \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
-The pre-registered comparison is the plain-filter mean minus the SMC2 mean, judged against the standard error of that difference. For \(\log\theta_2\) the difference is \(-0.0586\), with standard error 0.0865. For \(\log\theta_3\) the difference is \(-0.0354\), with standard error 0.0953. Both differences are negative, so the point estimates lie in the direction reported by \citet{golightly2026}, and neither absolute difference exceeds its standard error. The shift is unresolved. It is not reported as appearing, and it is not reported as failing to appear. The Rao-Blackwellised mean is closer to the SMC2 mean on \(\log\theta_2\), where the absolute gap is 0.0055 against 0.0586, and not on \(\log\theta_3\), where the absolute gap is 0.0446 against 0.0354. The reduction on both coordinates, which the rule asked for, does not hold.
+The comparison was fixed before the runs. Let \(m(a, j)\) be the average, over the four replicates, of the terminal weighted mean of \(\log\theta_j\) under filter \(a\), and let \(s(a, j)\) be the sample standard deviation of those four means, with divisor \(n-1\). The standard error of \(m(\mathrm{plain}, j) - m(\mathrm{SMC2}, j)\) is
+\begin{equation}
+\label{eq:se}
+\sqrt{\bigl(s(\mathrm{plain}, j)^{2} + s(\mathrm{SMC2}, j)^{2}\bigr)/4}.
+\end{equation}
+Table~2 of \citet{golightly2026} reports estimators of \(\mathrm{E}(\log\theta_i)\). The prose of their Section~5.2 says that the plain filter shifts the posterior means of \(\theta_2\) and \(\theta_3\) downward. We apply the comparison to \(\log\theta_2\) and \(\log\theta_3\), which is the scale of that table. The downward shift is resolved on a coordinate if the plain-filter difference is negative and its absolute value exceeds \eqref{eq:se}. It is reported as appearing only if it is resolved on both coordinates, and as failing to appear only if the plain-filter mean is at least the SMC2 mean on both. Otherwise it is unresolved.
 
-For \(\log\theta_1\), which had no pass mark, the plain-filter mean exceeds the SMC2 mean by 0.1227, with standard error 0.0688. The Rao-Blackwellised gap on that coordinate is 0.0152. The mean number of proposals is 405 in each filter, and the mean numbers of acceptances are 79.25, 76.25 and 83.25. The largest fraction of Euler draws that met the floor is 0.008064, below the limit 0.01 fixed in the design. The draw counts in Table~\ref{tab:lv} do not include the observation-density evaluations inside \eqref{eq:rb}, so they understate the cost of the Rao-Blackwellised weight relative to the plain filter.
+For \(\log\theta_2\) the difference is \(-0.0586\), with standard error 0.0865. For \(\log\theta_3\) the difference is \(-0.0354\), with standard error 0.0953. Both differences are negative, so the point estimates lie in the direction reported by \citet{golightly2026}, and neither absolute difference exceeds its standard error. The shift is unresolved. The bars in Figure~\ref{fig:lv} include zero on both coordinates. The Rao-Blackwellised mean is closer to the SMC2 mean on \(\log\theta_2\), where the absolute gap is 0.0055 against 0.0586, and further from it on \(\log\theta_3\), where the absolute gap is 0.0446 against 0.0354. A reduction on both coordinates does not hold.
+
+For \(\log\theta_1\), which was not part of the shift comparison, the plain-filter mean exceeds the SMC2 mean by 0.1227, with standard error 0.0688. The absolute difference exceeds the standard error, and the sign is positive. The Rao-Blackwellised gap on that coordinate is 0.0152. The mean number of proposals is 405 in each filter, and the mean numbers of acceptances are 79.25, 76.25 and 83.25. The largest fraction of Euler draws that met the floor is 0.008064. The draw counts in Table~\ref{tab:lv} do not include the observation-density evaluations inside \eqref{eq:rb}, so they understate the cost of the Rao-Blackwellised weight relative to the plain filter.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{lv-differences.pdf}
+\caption{Lotka--Volterra series. Difference, from the SMC2 mean, of the average terminal weighted posterior mean of \(\log\theta_j\). The bars are the standard errors \eqref{eq:se}, using the Rao-Blackwellised replicate standard deviation in place of the plain-filter standard deviation for the open circles. The dashed line is equality with SMC2. The shift comparison uses \(\log\theta_2\) and \(\log\theta_3\).}
+\label{fig:lv}
+\end{figure}

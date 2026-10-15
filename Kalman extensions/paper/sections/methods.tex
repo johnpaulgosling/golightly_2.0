@@ -1,56 +1,164 @@
 \section{Methods}
 \label{sec:methods}
 
-The observation model in the linear Gaussian case is
+We consider a state-space model with static parameter \(\theta \in \Omega \subseteq \mathbb{R}^{d_\theta}\). The latent state \(X_t \in \mathbb{R}^{d_x}\) has initial density \(p_0^{(\theta)}\) and transition densities \(p_t^{(\theta)}(x_t \mid x_{t-1})\) for \(t = 1, \ldots, T\). The observation \(Y_t \in \mathbb{R}^{d_y}\) has density \(f_t^{(\theta)}(y_t \mid x_t)\). The exact parameter posterior at time \(t\) is
+\begin{equation}
+\label{eq:exact}
+\pi_t(\theta \mid y_{0:t})
+  \propto \pi(\theta)\, p_t^{(\theta)}(y_{0:t}),
+\end{equation}
+where \(p_t^{(\theta)}(y_{0:t})\) is the observed-data likelihood. The sequential factorisation of that likelihood multiplies the posterior at time \(t-1\) by the predictive density of the new observation. That predictive density is the integral of the transition and the observation density against the filtering distribution of the state. It is the object the constructions below replace.
+
+\subsection{Ensemble Kalman likelihood}
+\label{sec:enkf-lik}
+
+The linear Gaussian observation model is
 \begin{equation}
 \label{eq:obs}
 f_t^{(\theta)}(y_t \mid x_t) = \mathcal{N}(y_t; Hx_t, R).
 \end{equation}
-An ensemble of size \(N\) is propagated by the state transition. The forecast mean \(\hat{\mu}_{t\mid t-1}\) and covariance \(\hat{\Sigma}_{t\mid t-1}\) are the sample moments, with divisor \(N-1\). The ensemble Kalman likelihood contribution is
+An ensemble of size \(N\) represents the filtering distribution at the previous time. Algorithm~1 is one ensemble Kalman step at a fixed \(\theta\), in the stochastic form used by \citet[Algorithm~3]{golightly2026}. The sample covariance uses the divisor \(N-1\).
+
+\medskip
+\noindent\textbf{Algorithm 1.} \emph{Ensemble Kalman step at time \(t\), for one parameter.}
+\begin{enumerate}
+\item Forecast. For \(j = 1, \ldots, N\), draw \(\tilde{x}_t^j\) from the transition \(p_t^{(\theta)}(\cdot \mid x_{t-1}^j)\).
+\item Forecast moments. Set \(\hat{\mu}_{t\mid t-1} = N^{-1} \sum_{j=1}^{N} \tilde{x}_t^j\), and let \(\hat{\Sigma}_{t\mid t-1}\) be the sample covariance of the forecast ensemble.
+\item Likelihood contribution. Evaluate
 \begin{equation}
 \label{eq:enkf-lik}
 \hat{p}_{\mathrm{enkf},t}^{(\theta)}(y_t \mid y_{0:t-1})
   = \mathcal{N}\bigl(y_t; H\hat{\mu}_{t\mid t-1},\, H\hat{\Sigma}_{t\mid t-1}H^{\top}+R\bigr).
 \end{equation}
-This contribution is exact for the Gaussian forecast approximation and is not unbiased for the true predictive density. The product of these contributions, multiplied by the prior, defines \(\hat{\pi}_{\mathrm{enkf},t}\) up to the ensemble randomness carried by the extended target of \citet[Section~4.1]{golightly2026}. The exact posterior at the same time is \(\pi_t(\theta \mid y_{0:t})\). The first error is the difference between these two distributions.
+\item Kalman gain. Set \(\hat{K}_t = \hat{\Sigma}_{t\mid t-1} H^{\top} (H\hat{\Sigma}_{t\mid t-1}H^{\top}+R)^{-1}\).
+\item Analysis. For each member, draw a pseudo-observation \(\tilde{y}_t^j \sim \mathcal{N}(H\tilde{x}_t^j, R)\) and set \(x_t^j = \tilde{x}_t^j + \hat{K}_t(y_t - \tilde{y}_t^j)\).
+\end{enumerate}
+
+Equation~\eqref{eq:enkf-lik} is exact for the Gaussian forecast. It is a biased estimator of the true predictive density. The product of these contributions, multiplied by the prior, defines a parameter posterior that still depends on the ensembles drawn along the series. \citet[Section~4.1]{golightly2026} write the corresponding extended target. Its \(\theta\)-marginal is \(\hat{\pi}_{\mathrm{enkf},t}\). The first error is the difference between \(\hat{\pi}_{\mathrm{enkf},t}\) and \(\pi_t(\theta \mid y_{0:t})\).
 
 \subsection{Plain nested filter}
+\label{sec:plain}
 
-The outer recursion follows Algorithm~6 of \citet{golightly2026}. At time \(t\), each parameter particle is updated by one ensemble Kalman step and its weight is multiplied by \eqref{eq:enkf-lik}. If the effective sample size is at least \(\gamma M\), the cloud is left as it is. Otherwise the particles are resampled with replacement, the weights are reset to \(1/M\), and each particle is offered one Metropolis--Hastings proposal. The proposal is a random walk whose covariance is \(\zeta\) times the sample covariance of the other resampled particles. In the studies below, \(\zeta^{2} = 2.56^{2}/d_{\theta}\) and the ensemble size is held fixed. The acceptance ratio uses the prior and the ensemble Kalman likelihood of the series so far. The likelihood at a proposed value is obtained by rerunning the filter from the known initial condition.
+The outer recursion follows \citet[Algorithm~6]{golightly2026}. At time \(t\), each of \(M\) parameter particles is updated by Algorithm~1 and its weight is multiplied by \eqref{eq:enkf-lik}. Let \(\gamma \in (0, 1)\) be the effective-sample-size fraction. If the effective sample size of the updated cloud is at least \(\gamma M\), the cloud is left as it is. Otherwise the particles are resampled with replacement, the weights are reset to \(1/M\), and each particle is offered one Metropolis--Hastings proposal. The proposal is a random walk whose covariance is \(\zeta\) times the sample covariance of the resampled particles other than the particle being moved. We take \(\zeta^{2} = 2.56^{2}/d_{\theta}\), the scaling \citet[Section~4.1]{golightly2026} cite from the pseudo-marginal random-walk literature. The acceptance ratio uses the prior and the ensemble Kalman likelihood of the series so far. The likelihood at a proposed value is obtained by rerunning Algorithm~1 from the known initial condition. For this random walk the Gaussian proposal is symmetric, provided the covariance is held fixed during the ratio, and the proposal ratio equals one.
 
-The printed Algorithm~6 places the effective-sample-size test inside the particle loop. The surrounding text applies one resample-move step when the effective sample size of the updated cloud falls below \(\gamma M\). We follow the surrounding text.
+The printed Algorithm~6 of \citet{golightly2026} places the effective-sample-size test inside the loop over parameter particles. The text of their Section~4.1 applies one resample-move step when the effective sample size of the updated cloud falls below \(\gamma M\), which is the order SMC2 uses. We follow that text: every particle receives its likelihood increment, and the test is applied once.
 
-For the nonlinear Gaussian observation in Section~\ref{sec:sim}, the matrix \(R\) in \eqref{eq:enkf-lik} is replaced by the scalar \(\tilde{R} = H\hat{\mu}_{t\mid t-1}\), as in Section~5.2 of \citet{golightly2026}. The plain filter then targets \(\hat{\pi}_{\mathrm{enkf}}\) under that choice. It does not evaluate the true observation density.
+\citet[Section~4.1]{golightly2026} also allow the ensemble size to grow when an estimate of the variance of the log ensemble Kalman likelihood exceeds a threshold. The comparisons in Section~\ref{sec:sim} hold \(N\) fixed. A fixed ensemble size is the regime in which their discussion suggests a surrogate weight. Holding \(N\) fixed does not change the nominal target of a Metropolis--Hastings kernel that evaluates \eqref{eq:enkf-lik}. It removes the extra randomness of the growth rule from the comparison.
+
+For the nonlinear Gaussian observation in Section~\ref{sec:lv}, the matrix \(R\) in \eqref{eq:enkf-lik} is replaced by the scalar \(\tilde{R} = H\hat{\mu}_{t\mid t-1}\), as in Section~5.2 of \citet{golightly2026}. The plain filter then targets \(\hat{\pi}_{\mathrm{enkf}}\) under that choice. It does not evaluate the true observation density. Figure~\ref{fig:targets} places this target relative to the other three.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  box/.style={draw, align=center, text width=11.2cm, inner sep=5pt},
+  arr/.style={-{Stealth[length=2.2mm]}, thick},
+  tag/.style={font=\footnotesize, fill=white, inner sep=1pt}
+]
+  \node[box] (exact) {Exact observed-data likelihood\\[1pt]
+    bootstrap SMC\(^{2}\) targets \(\pi_t\)};
+  \node[box, below=0.85cm of exact] (rb) {Gaussian forecast, true observation density restored\\[1pt]
+    Rao-Blackwellised weight targets \(\tilde{\pi}_{\mathrm{enkf}}\)};
+  \node[box, below=0.85cm of rb] (enkf) {Gaussian forecast and linear Gaussian observation\\[1pt]
+    plain nested filter targets \(\hat{\pi}_{\mathrm{enkf}}\)\\[1pt]
+    {\footnotesize a corrected nearest-neighbour screen stays here}};
+  \node[box, below=0.85cm of enkf] (knn) {Nearest-neighbour prediction of the ensemble Kalman likelihood\\[1pt]
+    surrogate weight targets \(\pi_{\mathrm{knn}}\)};
+  \draw[arr] (exact.south) -- (rb.north)
+    node[tag, midway, right] {Gaussian forecast};
+  \draw[arr] (rb.south) -- (enkf.north)
+    node[tag, midway, right] {observation replaced};
+  \draw[arr] (enkf.south) -- (knn.north)
+    node[tag, midway, right] {surrogate weight};
+\end{tikzpicture}
+\caption{Parameter targets induced by four likelihoods. Each arrow replaces the likelihood used for the parameter weight. The first error is the ensemble Kalman likelihood against the true likelihood: the forecast remains Gaussian, so \(\tilde{\pi}_{\mathrm{enkf}}\) and \(\hat{\pi}_{\mathrm{enkf}}\) both differ from \(\pi_t\). The second error is the nearest-neighbour prediction against the ensemble Kalman likelihood. A nearest-neighbour screen that is corrected by the ensemble Kalman likelihood stays on \(\hat{\pi}_{\mathrm{enkf}}\).}
+\label{fig:targets}
+\end{figure}
 
 \subsection{Rao-Blackwellised weight}
+\label{sec:rb}
 
-For a general observation density \(f\), the filter can still be run under a linear Gaussian approximation \(g_t^{(\theta)}(y_t \mid x_t) = \mathcal{N}(y_t; \tilde{H} x_t, \tilde{R})\). The Rao-Blackwellised increment averages, over the analysis ensemble, the terms
+For a general observation density \(f\), the filter can still be run under a linear Gaussian approximation \(g_t^{(\theta)}(y_t \mid x_t) = \mathcal{N}(y_t; \tilde{H} x_t, \tilde{R})\). One ensemble Kalman step under \(g\) produces an analysis ensemble and a Gaussian predictive likelihood \(\hat{g}_{\mathrm{enkf},t}^{(\theta)}\). The Rao-Blackwellised increment is the average, over the \(N\) analysis members, of
 \begin{equation}
 \label{eq:rb}
-\hat{g}_{\mathrm{enkf},t}^{(\theta)}(y_t)\, \frac{f_t^{(\theta)}(y_t \mid x_t^{j})}{g_t^{(\theta)}(y_t \mid x_t^{j})}.
+\hat{g}_{\mathrm{enkf},t}^{(\theta)}(y_t)\,
+  \frac{f_t^{(\theta)}(y_t \mid x_t^{j})}{g_t^{(\theta)}(y_t \mid x_t^{j})}.
 \end{equation}
-The parameter target induced by these increments is \(\tilde{\pi}_{\mathrm{enkf},t}\). The ratio \(f/g\) puts the true observation density back. The Gaussian forecast remains, so \(\tilde{\pi}_{\mathrm{enkf},t}\) is not \(\pi_t\).
+The parameter target induced by these increments is \(\tilde{\pi}_{\mathrm{enkf},t}\). The ratio \(f/g\) puts the true observation density back. The Gaussian forecast remains, so the transition density between observation times is never required, and \(\tilde{\pi}_{\mathrm{enkf},t}\) is not \(\pi_t\). Figure~\ref{fig:increment} shows the three increments on the observation used in Section~\ref{sec:lv}.
 
 \begin{lemma}
 \label{lem:identity}
 If \(f_t^{(\theta)} = g_t^{(\theta)}\), the Rao-Blackwellised increment equals the ensemble Kalman increment \eqref{eq:enkf-lik}.
 \end{lemma}
 
-The ratio in \eqref{eq:rb} is then equal to 1 for every analysis member, and the average of those terms is the predictive likelihood under \(g\), which is \eqref{eq:enkf-lik}. The incremental weights agree, and so do the parameter targets. Evaluating the ratio costs an extra density for each ensemble member and does not change the estimate. The cancellation uses equality of the two observation densities. It does not, by itself, describe a nonlinear observation.
+\begin{proof}
+The ratio in \eqref{eq:rb} equals 1 for every analysis member. The average of those terms is the Gaussian predictive likelihood under \(g\). Under the hypothesis, that likelihood is \eqref{eq:enkf-lik}.
+\end{proof}
 
-In the Lotka--Volterra comparison the true density \(f\) is Gaussian with variance equal to the prey component. The plain filter uses \(\tilde{R} = H\hat{\mu}_{t\mid t-1}\). The Rao-Blackwellised filter uses the same quantity multiplied by 2, which is the inflation stated in Section~5.2 of \citet{golightly2026}, and it evaluates \(f/g\) at the analysis members. Vanilla SMC2 does not use \(g\). Its state weight is \(f\), its proposal is the Euler--Maruyama transition, and its parameter target is \(\pi_t\).
+The incremental weights therefore agree, and so do the parameter targets. Evaluating the ratio costs an extra density for each ensemble member and does not change the estimate. The cancellation uses equality of the two observation densities. It does not, by itself, describe a nonlinear observation, and it does not say that \(\hat{\pi}_{\mathrm{enkf}}\) equals \(\pi_t\). Both weights can be wrong together when the forecast is replaced by a Gaussian.
+
+In the Lotka--Volterra comparison the true density \(f\) is Gaussian with variance equal to the prey component. The plain filter uses \(\tilde{R} = H\hat{\mu}_{t\mid t-1}\). The Rao-Blackwellised filter uses the same quantity multiplied by 2, which is the inflation in Section~5.2 of \citet{golightly2026}, and it evaluates \(f/g\) at the analysis members. The inflation is a proposal adjustment. It is not a claim that the true variance is twice the forecast mean. Bootstrap SMC2 does not use \(g\). Its state weight is \(f\), its proposal is the transition, and its parameter target is \(\pi_t\), up to the discretisation of that transition.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw, align=center, text width=3.45cm, inner sep=4pt, minimum height=2.15cm},
+  head/.style={draw, align=center, text width=11.2cm, inner sep=4pt},
+  arr/.style={-{Stealth[length=2mm]}}
+]
+  \node[head] (head) at (0,0) {Latent prey--predator state. Only prey is observed, with \(y \sim \mathcal{N}(x_1, x_1)\).};
+  \node[box] (plain) at (-3.9,-2.55) {Plain increment\\[2pt] Gaussian forecast.\\ Variance \(\tilde{R}\) equals the forecast mean of prey.};
+  \node[box] (rbbox) at (0,-2.55) {Rao-Blackwellised\\[2pt] Same forecast.\\ Variance \(2\tilde{R}\), then multiply by the average of \(f/g\).};
+  \node[box] (smc) at (3.9,-2.55) {Bootstrap SMC\(^{2}\)\\[2pt] Propose from the transition.\\ Weight each state particle by the true density \(f\).};
+  \draw[arr] (head.south) -- (plain.north);
+  \draw[arr] (head.south) -- (rbbox.north);
+  \draw[arr] (head.south) -- (smc.north);
+\end{tikzpicture}
+\caption{One observation update for the Lotka--Volterra model of Section~\ref{sec:lv}. The plain increment replaces the state-dependent variance \(x_1\) by the forecast mean of the prey. The Rao-Blackwellised increment inflates that variance and then reintroduces \(f\) through \(f/g\). Bootstrap SMC2 uses \(f\) directly. The nearest-neighbour increment replaces the plain increment by an inverse-distance average of stored plain increments and does not evaluate a forecast at the particle being weighted.}
+\label{fig:increment}
+\end{figure}
 
 \subsection{Nearest-neighbour weight}
+\label{sec:knn}
 
-If the incremental weight is a nearest-neighbour prediction of \eqref{eq:enkf-lik}, the weights target
+\citet[Section~4.2]{golightly2026} build a surrogate from stored log ensemble Kalman likelihoods. For a point \(\theta\), let \(\theta^{[1]}, \ldots, \theta^{[k]}\) be the \(k\) nearest neighbours under a chosen metric, with distances \(d_{[i]}\). The surrogate log-likelihood is the inverse-distance average of the stored values. If some distance is zero, the surrogate equals the stored log-likelihood at that neighbour. In delayed acceptance this average replaces the ensemble Kalman likelihood in the first-stage acceptance probability only. The second stage evaluates the ensemble Kalman likelihood. Under the conditions of \citet[Theorem~1]{christen2005}, recalled in Section~\ref{sec:related}, the invariant distribution remains \(\hat{\pi}_{\mathrm{enkf}}\).
+
+The second error begins when the same average is used as the incremental weight, with no second stage. Write \(\ell_{\mathrm{knn},t}(\theta)\) for the surrogate log-likelihood of \(y_{0:t}\) at \(\theta\), built from a stored cloud. The weights then target
 \begin{equation}
 \label{eq:knn-target}
-\pi_{\mathrm{knn},t}(\theta) \propto \pi(\theta)\, \exp\bigl(\ell_{\mathrm{knn},t}(\theta)\bigr),
+\pi_{\mathrm{knn},t}(\theta)
+  \propto \pi(\theta)\, \exp\bigl(\ell_{\mathrm{knn},t}(\theta)\bigr),
 \end{equation}
-conditional on the stored cloud that defines the surrogate log-likelihood \(\ell_{\mathrm{knn},t}\). This is the second error. Equation~\eqref{eq:knn-target} is not \(\hat{\pi}_{\mathrm{enkf},t}\), and a comparison of \(\pi_{\mathrm{knn},t}\) with \(\pi_t\) mixes the two errors.
+conditional on that cloud. Equation~\eqref{eq:knn-target} is not \(\hat{\pi}_{\mathrm{enkf},t}\). A comparison of \(\pi_{\mathrm{knn},t}\) with \(\pi_t\) mixes the two errors in Figure~\ref{fig:targets}.
 
-In the linear Gaussian pilot the first \(k\) particles are a reference set and are always updated with the ensemble Kalman filter. Every other particle takes the inverse-distance prediction of the reference increments. The diagnostic, fixed before that run, recomputes \eqref{eq:enkf-lik} for eight non-reference particles at the terminal time. The surrogate increment was to be called a poor approximation of the ensemble Kalman increment if the mean, over replicates, of the median absolute log difference exceeded 1.
+In the linear Gaussian comparison of Section~\ref{sec:sim} the first \(k\) particles, in the current order, are a reference set and are always updated with Algorithm~1. Every other particle takes the inverse-distance prediction of the reference particles' incremental log-likelihoods and does not run a forecast for that weight. When a rejuvenation is triggered, the move screens with the surrogate built from the reference cloud, and a proposal that passes the screen is still accepted or rejected with the ensemble Kalman likelihood. The weight and the screen are therefore not the same object inside that run. The weight of a non-reference particle targets the surrogate. The move, on the proposals that reach the second stage, still uses \(\hat{\pi}_{\mathrm{enkf}}\). We report the weight error directly, by recomputing \eqref{eq:enkf-lik} at a subset of non-reference particles, rather than by treating the whole cloud as a draw from one of the two posteriors.
 
-A uniform bound \(\delta\) on \(|\ell_{\mathrm{knn},t}(\theta) - \ell_{\mathrm{enkf},t}(\theta)|\) over the prior support would imply that the total variation distance between the two posteriors built from those fixed log-likelihoods is at most \(\min\bigl(1, (e^{2\delta}-1)/2\bigr)\). The short calculation is recorded in the theory note of 15 October 2026. The hypothesis was not proved. The ensemble Kalman log-likelihood is a random function of the ensemble, the diagnostic is not a uniform \(\delta\), and no Lipschitz constant for that log-likelihood was available from the papers we used. The diagnostic remains the comparison we report. We do not state a theorem for the distance.
+\subsection{A bound that does not close}
+\label{sec:bound}
 
-The same pilot also compared an exact tree with a list, a kernel switch that depends only on time, and a finite-difference random-walk proposal. Those comparisons are not part of the claim. The finite-difference proposal leaves \(\hat{\pi}_{\mathrm{enkf}}\) invariant when the Gaussian proposal density is included in the acceptance ratio, and the pilot did not support it on effective sample size per transition draw.
+A uniform bound on the log-likelihood difference would control the two posteriors built from two fixed log-likelihoods. The following calculation is conditional on that hypothesis. It is not a theorem about \(\pi_{\mathrm{knn}}\).
+
+\begin{lemma}
+\label{lem:tv}
+Let \(\ell_1\) and \(\ell_2\) be fixed log-likelihoods, and define \(\pi_i(\theta) \propto \pi(\theta) \exp(\ell_i(\theta))\) for \(i = 1, 2\), with both normalising constants finite and positive. If \(|\ell_1(\theta) - \ell_2(\theta)| \le \delta\) at every \(\theta\) in the support of the prior, then
+\begin{equation}
+\label{eq:tv}
+\|\pi_1 - \pi_2\|_{\mathrm{TV}}
+  \le \min\bigl(1,\ (e^{2\delta}-1)/2\bigr).
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Set \(r(\theta) = \exp(\ell_1(\theta) - \ell_2(\theta))\) and \(\mu = \mathrm{E}_{\pi_2}[r]\). The hypothesis gives \(e^{-\delta} \le r(\theta) \le e^{\delta}\), and the same bounds pass to \(\mu\). The density ratio \(\rho = \pi_1/\pi_2 = r/\mu\) therefore satisfies \(e^{-2\delta} \le \rho \le e^{2\delta}\). The larger deviation from 1 is \(e^{2\delta}-1\), since \(1 - e^{-2\delta} \le e^{2\delta}-1\) for \(\delta \ge 0\). Total variation is half the expectation of \(|\rho-1|\) under \(\pi_2\), and it is at most 1, which is \eqref{eq:tv}.
+\end{proof}
+
+The hypothesis was not established for \(\ell_{\mathrm{knn},t}\) and the ensemble Kalman log-likelihood. Three obstructions are enough to stop the argument.
+
+Firstly, both log-likelihoods in Lemma~\ref{lem:tv} are fixed functions. The ensemble Kalman log-likelihood is a random function of the ensemble. The surrogate log-likelihood is a function of whichever cloud has been stored. A fresh ensemble Kalman evaluation, of the kind used in the diagnostic, is a new draw. The marginal \(\hat{\pi}_{\mathrm{enkf}}\) still contains that randomness through the extended target. Equation~\eqref{eq:knn-target} conditions on the stored cloud. The two objects in the lemma are not these two targets.
+
+Secondly, the diagnostic in Section~\ref{sec:sim} is a median absolute difference of one increment, on eight non-reference particles, averaged over replicates. It is not a uniform \(\delta\) on the log-likelihood of the series, over the support of the prior. Substituting the diagnostic into \eqref{eq:tv} would not prove a total-variation bound.
+
+Thirdly, a Lipschitz route does not supply the missing \(\delta\). If a single fixed log-likelihood were Lipschitz with constant \(L\), the absolute error of the inverse-distance average would be at most \(k L / \sum_{i=1}^{k} d_{[i]}^{-1}\): each neighbour contributes an error of at most \(L d_{[i]}\), and the weight \(d_{[i]}^{-1}\) cancels that factor. No finite Lipschitz constant for the ensemble Kalman log-likelihood is available on the support of the gamma priors used below, and that support is unbounded. The same comparison does not apply across two independent ensemble draws.
+
+\citet[Proposition~1]{chopin2012} does not fill the gap, because the nearest-neighbour weight is not unbiased for the ensemble Kalman likelihood. \citet[Section~5.1]{sherlock2016} warn that targeting the surrogate invalidates draws from the expensive posterior, and they do not bound the difference. \citet[Proposition~2]{katzfuss2018} concerns the variance of a log ensemble Kalman likelihood under independent forecast draws. Variance of that kind points away from a small uniform \(\delta\): the log-likelihood moves when the ensemble is redrawn. The diagnostic in Section~\ref{sec:sim} remains the comparison we report. We do not state a theorem for the distance between \(\pi_{\mathrm{knn}}\) and \(\hat{\pi}_{\mathrm{enkf}}\).

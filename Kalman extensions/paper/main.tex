@@ -2,10 +2,16 @@
 
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{placeins}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
 \usepackage{natbib}
 \newtheorem{lemma}{Lemma}
 \setcitestyle{aysep={}}
 \usepackage[margin=2.5cm]{geometry}
+\graphicspath{{figures/}}
 
 \title{Likelihood targets of a nested ensemble Kalman filter}
 \author{Andrew Golightly\\
@@ -16,7 +22,7 @@ Department of Mathematical Sciences, Durham University}
 \maketitle
 
 \begin{abstract}
-State-space models with a static parameter have an observed-data likelihood that integrates out a latent Markov process. Nested particle filters for the parameter become expensive as the observation dimension grows. Replacing each likelihood increment by an ensemble Kalman forecast changes the posterior, and replacing that forecast by a nearest-neighbour prediction changes it again. These are different errors. We separate them. The plain filter targets the ensemble Kalman posterior. The nearest-neighbour weight targets the surrogate posterior. A Rao-Blackwellised weight puts the true observation density back, whilst the forecast stays Gaussian. If the observation density is already that Gaussian density, the two weights agree. On a Lotka--Volterra diffusion, with prey observed under a Gaussian density whose variance equals the latent prey, we compare the plain filter, the Rao-Blackwellised filter and bootstrap sequential Monte Carlo squared. The plain filter lies 0.0586 and 0.0354 below the bootstrap filter on the log predation coefficient and the log predator death rate. Neither gap exceeds its standard error, so the shift is unresolved. No bound between the surrogate posterior and the ensemble Kalman posterior was obtained.
+State-space models with a static parameter have an observed-data likelihood that integrates out a latent Markov process. Nested particle filters for the parameter become expensive as the observation dimension grows. An ensemble Kalman forecast supplies a cheaper likelihood increment, and a nearest-neighbour prediction of that increment is cheaper still. These replacements change the posterior in different ways. We separate the two errors. The plain nested filter targets the posterior induced by the ensemble Kalman likelihood. The nearest-neighbour weight targets the posterior induced by the surrogate. A nearest-neighbour screen that is then corrected by the ensemble Kalman likelihood leaves the first of those posteriors invariant. A Rao-Blackwellised weight restores the true observation density whilst the forecast remains Gaussian. When the observation density is already that linear Gaussian density, the two weights agree, so the correction has nothing to change. On a Lotka--Volterra diffusion whose prey observation has variance equal to the latent prey, the plain filter lies 0.0586 and 0.0354 below bootstrap sequential Monte Carlo squared on the log predation coefficient and the log predator death rate. Neither gap exceeds its standard error. A uniform bound between the surrogate posterior and the ensemble Kalman posterior is not obtained.
 \end{abstract}
 
 \noindent\textbf{Keywords:} Lotka--Volterra model, Rao-Blackwellisation, sequential Monte Carlo, state-space model, surrogate likelihood
