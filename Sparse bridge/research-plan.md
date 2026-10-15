@@ -23,21 +23,21 @@ Do the phases in order. Do not write code, derivations, or manuscript prose unti
 | 1.3 | Freeze notation | done | same file, section "Notation" |
 | 2.1 | Summarise the literature already opened | done | `notes/02-literature-summary.md` |
 | 2.2 | Comparison of guides, with unread cells left empty | done | same file, section "Comparison" |
-| 3.1 | Obtain and file the missing named sources, or stop | parked | `[PDF NOT STORED]` lines in the literature note |
-| 3.2 | Search for work the named sources do not cover | not started | `notes/03-search-log.md` |
-| 4.1 | Write the theory agenda | not started | `notes/04-theory-agenda.md` |
-| 4.2 | Decide what will be attempted | not started | same file, section "Scope decision" |
-| 5.1 | Restate the 2025 filter and the linear guide | not started | `notes/05-theory-notes.md` |
-| 5.2 | Settle when the linear guide is inconsistent | not started | same file |
-| 5.3 | Settle the replacement proposal | not started | same file |
-| 5.4 | Record failures and drop what will not be claimed | not started | same file, section "Dropped" |
-| 6.1 | Design the simulation studies | not started | `notes/06-simulation-design.md` |
-| 6.2 | Implement the algorithms in base R | not started | `R/*.R` |
-| 6.3 | Run the studies and store the output | not started | `scripts/*.R`, `results/` |
-| 6.4 | Write the numerical findings | not started | `notes/06-simulation-findings.md` |
-| 6b.1 | Choose or decline a real application | not started | `notes/07-application-choice.md` |
-| 6b.2 | Carry out the chosen application | not started | only if 6b.1 selects a series |
-| 7.1 | Plan the paper | not started | `notes/08-presentation-plan.md` |
+| 3.1 | Obtain and file the missing named sources, or stop | done | three PDFs in `Literature/`; summary blocks in `notes/02-literature-summary.md` |
+| 3.2 | Search for work the named sources do not cover | done | `notes/03-search-log.md` |
+| 4.1 | Write the theory agenda | done | `notes/04-theory-agenda.md` |
+| 4.2 | Decide what will be attempted | done | same file, section "Scope decision" |
+| 5.1 | Restate the 2025 filter and the linear guide | done | `notes/05-theory-notes.md` |
+| 5.2 | Settle when the linear guide is inconsistent | done | same file, section "5.2" |
+| 5.3 | Settle the replacement proposal | parked | same file, section "5.3"; no modified algorithm |
+| 5.4 | Record failures and drop what will not be claimed | done | same file, section "Dropped" |
+| 6.1 | Design the simulation studies | done | `notes/06-simulation-design.md`; S2 omitted because 5.3 is parked |
+| 6.2 | Implement the algorithms in base R | done | `R/models-dsir.R`, `R/dsir-linear-guide.R`. No `R/dsir-filter.R`: S1 does not run rejuvenation. No replacement file |
+| 6.3 | Run the studies and store the output | done | `scripts/study-sparse-bridge-s1.R`, `results/s1-*.csv`. S2 not run |
+| 6.4 | Write the numerical findings | done | `notes/06-simulation-findings.md` |
+| 6b.1 | Choose or decline a real application | done | `notes/07-application-choice.md`; declined |
+| 6b.2 | Carry out the chosen application | parked | skipped because 6b.1 declined |
+| 7.1 | Plan the paper | done | `notes/08-presentation-plan.md`; manuscript not drafted |
 | 8.1 | Write the LaTeX manuscript | not started | `paper/` |
 | 9.1 | Write the reproduction script | not started | `scripts/reproduce-sparse-bridge.R` |
 
@@ -358,6 +358,16 @@ Document, in a header comment, how to run it from the repository root and what i
 Acceptance: from a clean results directory, the script regenerates the numbers cited in the manuscript. Check this once and record the command in the script header.
 
 ## Handover
+
+### 15 October 2026, continued after the three PDFs were filed
+
+- Current task: 7.1 is done. Phases 8 and 9 have not been started. Task 5.3 and task 6b.2 are parked.
+- Files touched in this continuation: the three PDFs under `Sparse bridge/Literature/`; `notes/01-paper-context.md` (dated amendments that the three PDFs are stored); `notes/02-literature-summary.md`; `notes/03-search-log.md`; `notes/04-theory-agenda.md`; `notes/05-theory-notes.md`; `notes/06-simulation-design.md`; `notes/06-simulation-findings.md`; `notes/07-application-choice.md`; `notes/08-presentation-plan.md`; `R/models-dsir.R`; `R/dsir-linear-guide.R`; `scripts/study-sparse-bridge-s1.R`; `results/s1-*.csv` and the pre-registered pilot files.
+- What is already reliable: the literature blocks written from the three PDFs; the scope decision that parks part B; the part A reading in the theory note; the S1 numbers in `results/s1-study-summary.csv`, as restated in the findings note.
+- What the next agent should not trust: a mapping from Golightly and Sherlock (2019), equation (19), or from Corstanje et al. (2023), equation (16), into the Algorithm 2 denominator. None was written, because the sources do not contain it. The pilot CSVs are not the study. The earlier handover below is out of date on task 3.1.
+- Why 5.3 is parked: neither stored guide evaluates the density of Poisson incidence increments on the dSEIR grid. Details are in the theory note, Section 5.3.
+- Why 6b.2 is parked: the weekly counts are not stored. `notes/07-application-choice.md`.
+- Next action: do not draft `paper/` unless the presentation plan is followed as a diagnostic article with part B left as future work. Do not code a replacement guide without a new source that states the density Algorithm 2 divides by. Do not scrape Ebola or COVID-19 counts.
 
 ### 15 October 2026
 
