@@ -117,6 +117,56 @@ A cell is filled only from a page that was read. "Secondary" means the sentence 
 | Golightly and Sherlock (2019), equation (19) | A Markov jump process, by Gillespie's method with the linear-noise conditioned hazard, without restarting the ODEs | The same Gaussian observation, through the linear-noise transition density in the Fearnhead ratio (6) | Yes. The weight is (3), and (4) estimates the transition density | Sections 4.3 and 3.1, read |
 | Corstanje et al. (2023), Theorem 4.2 | An inhomogeneous Poisson process, with rates from the guided generator (4) and the homogeneous-Poisson guide (15) | An exact integer end-point \(X_T = x_T\) | The ratio (16) is printed, and it contains the intractable transition probability \(h(0, x_0)\) | Section 4.1, read. Not an Algorithm 2 weight |
 
+## Amendment, 15 October 2026. Files added for the replacement
+
+The `[PDF NOT STORED]` lines for Whitaker et al. (2017) and Fearnhead et al. (2014) are superseded by the blocks below. Golightly and Kypraios (2018), Fintzi, Wakefield and Minin (2022) and Corstanje (2024) were not on that list. They are stored now. The phase 4 paragraph below this amendment was written before these files were opened. It is not deleted. The replacement that uses the new files is in `notes/05-theory-notes.md`, Section 5.3.
+
+### Golightly, Wadkin, Whitaker, Baggaley, Parker and Kypraios (2023)
+
+- Citation: Golightly, A., Wadkin, L. E., Whitaker, S. A., Baggaley, A. W., Parker, N. G. and Kypraios, T. Accelerating Bayesian inference for stochastic epidemic models using incidence data. *Statistics and Computing* (2023) 33:134. DOI 10.1007/s11222-023-10311-6.
+- Path: `Sparse bridge/Literature/Golightly2023-incidence-lna.pdf`. This file is the arXiv manuscript 2303.15371v2.
+- Reading: Sections 2.1, 2.2 and 3.1, and Section 3.3.2 through equation (25) and Algorithm 2. The oak-processionary application was not used.
+- What it gives for the replacement: equations (4), (8) and (9) are the incidence ODE, the fundamental matrix and the residual variance, restarted at the current state after equation (19). Equation (22) is a Gaussian approximation of a binomial observation of an incidence increment. The transition density they sample in Algorithm 1 is Gaussian, on the cumulative incidence at the next observation. That Gaussian density is not \(q\).
+- What it does not give: a product of Poisson probabilities on the subgrid of Whitaker et al. (2025).
+
+### Whitaker, Golightly, Boys and Sherlock (2017)
+
+- Citation: Whitaker, G. A., Golightly, A., Boys, R. J. and Sherlock, C. Improved bridge constructs for stochastic differential equations. *Statistics and Computing* (2017) 27:885–900. The stored file is arXiv:1509.09120v2.
+- Path: `Sparse bridge/Literature/Whitaker2017-improved-bridge-constructs.pdf`.
+- Reading: Section 3.1 through equation (28). The applications in Section 4 were not used as dSIR results.
+- What it gives: Section 3.1.2 approximates the conditional mean of a residual process by \(\hat{\rho}_t = P_t \psi_t P_T' F (F' P_T \psi_T P_T' F + \Sigma)^{-1}(y_T - F'\eta_T)\), after display (24). The covariance block \(P_t \psi_t P_T'\) is the one used for the infection residual in the theory note.
+- What it does not give: the proposal densities (15) and (25) are Gaussian densities of a diffusion skeleton. They are not the Poisson product \(q\).
+
+### Fearnhead, Giagos and Sherlock (2014)
+
+- Citation: Fearnhead, P., Giagos, V. and Sherlock, C. Inference for reaction networks using the linear noise approximation. *Biometrics* (2014) 70:457–466. DOI 10.1111/biom.12152.
+- Path: `Sparse bridge/Literature/Fearnhead2014-linear-noise-approximation.pdf`.
+- Reading: Section 4.2, including the restart paragraph, and Section 4.5. The simulation tables were not used.
+- What it gives: Section 4.2 re-initialises the linear-noise ODE at the start of each inter-observation interval. Golightly et al. (2023) cite this restart. The 2014 transition density is Gaussian for a reaction network observed with Gaussian error. It is not \(q\).
+
+### Golightly and Kypraios (2018)
+
+- Citation: Golightly, A. and Kypraios, T. Efficient \(\mathrm{SMC}^{2}\) schemes for stochastic kinetic models. *Statistics and Computing* (2018) 28:1215–1230. DOI 10.1007/s11222-017-9789-8.
+- Path: `Sparse bridge/Literature/Golightly2018-smc2-kinetic.pdf`.
+- Reading: the conditioned-hazard passage in Section 2, including equation (6). The \(\mathrm{SMC}^{2}\) recursions were not used.
+- What it gives: equation (6) is the constant-hazard Gaussian correction for a Gaussian observation of a kinetic state. Whitaker et al. (2025) name this paper beside the 2015 hazard. It does not replace that hazard.
+
+### Fintzi, Wakefield and Minin (2022)
+
+- Citation: Fintzi, J., Wakefield, J. and Minin, V. N. A linear noise approximation for stochastic epidemic models fit to partially observed incidence counts. *Biometrics* (2022) 78:1530–1541. The stored file is arXiv:2001.05099v2.
+- Path: `Sparse bridge/Literature/Fintzi2022-lna-incidence.pdf`.
+- Reading: the abstract, and the closing discussion on pp. 15–16 of the arXiv manuscript, including the sentence that the linear-noise approximation is reparameterised for incidence counts. The data-augmentation sampler was not read line by line.
+- What it gives: Golightly et al. (2023) cite this paper for an incidence linear-noise approximation. The equations integrated in the residual guide are those printed in the 2023 paper, not a transcription of an unread Fintzi display.
+- What it does not give: a Poisson proposal density for Algorithm 2.
+
+### Corstanje (2024)
+
+- Citation: Corstanje, M. A. Guiding techniques for conditioning Markov processes. PhD thesis, Vrije Universiteit Amsterdam, 2024. DOI 10.5463/thesis.792.
+- Path: `Sparse bridge/Literature/Corstanje2024-guiding-thesis.pdf`.
+- Reading: the contents, and Chapter 4 from Theorem 4.2.2 through Theorem 4.4.3, for the likelihood statements. The manifold chapter was not used.
+- What it gives: Corollary 4.3.6 and Theorem 4.4.2 are likelihood ratios for a guided chemical reaction process conditioned on an exact value, or an exact linear image, of the state at a fixed time. The ratio is a path-space functional. It still conditions on an exact end constraint.
+- What it does not give: a product of Poisson probabilities for binomial incidence on a fixed grid. Theorem 4.2 of Corstanje et al. (2023) is not repaired by dropping \(h(0, x_0)\).
+
 ## What phase 4 is not allowed to treat as settled
 
 - No opened paper states a numerical spacing at which the 2025 guide fails. Golightly and Sherlock (2019), Section 5.1, report that degradation for a death process, not for dSEIR incidence.

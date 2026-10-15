@@ -195,7 +195,7 @@ write_linear_table <- function(path, dest) {
   writeLines(lines, dest)
 }
 
-write_ess_figure <- function(path, dest) {
+write_ess_figure <- function(path, dest, residual_path = NULL) {
   rows <- read_summary_text(path)
   spacing_linear <- numeric(3)
   ess_linear <- numeric(3)
@@ -215,24 +215,40 @@ write_ess_figure <- function(path, dest) {
       ess_myopic[i_myopic] <- as.numeric(row["median_ess"])
     }
   }
+  spacing_residual <- numeric(0)
+  ess_residual <- numeric(0)
+  if (!is.null(residual_path) && file.exists(residual_path)) {
+    residual_rows <- read_summary_text(residual_path)
+    spacing_residual <- numeric(length(residual_rows))
+    ess_residual <- numeric(length(residual_rows))
+    for (i in seq_along(residual_rows)) {
+      spacing_residual[i] <- as.numeric(residual_rows[[i]]["spacing"])
+      ess_residual[i] <- as.numeric(residual_rows[[i]]["median_ess"])
+    }
+  }
   dir.create(dirname(dest), showWarnings = FALSE, recursive = TRUE)
   pdf(dest, width = 6.2, height = 4.4)
   # Figure 1. Study medians only. No new summary is computed.
+  y_max <- max(c(ess_linear, ess_myopic, ess_residual))
   plot(spacing_linear, ess_linear,
        type = "n",
        xlab = "Observation spacing",
        ylab = "Median effective sample size",
        xlim = c(1, 5),
-       ylim = c(0, max(c(ess_linear, ess_myopic)) * 1.05),
+       ylim = c(0, y_max * 1.05),
        xaxt = "n")
   axis(1, at = c(1, 2, 5))
   lines(spacing_linear, ess_linear, lty = 1)
   points(spacing_linear, ess_linear, pch = 16)
   lines(spacing_myopic, ess_myopic, lty = 2)
   points(spacing_myopic, ess_myopic, pch = 1)
+  if (length(ess_residual) > 0) {
+    lines(spacing_residual, ess_residual, lty = 1)
+    points(spacing_residual, ess_residual, pch = 17)
+  }
   legend("topright",
-         legend = c("Linear guide", "Myopic comparator"),
-         pch = c(16, 1), lty = c(1, 2), bty = "n")
+         legend = c("Linear guide", "Myopic comparator", "Residual guide"),
+         pch = c(16, 1, 17), lty = c(1, 2, 1), bty = "n")
   dev.off()
 }
 
@@ -240,5 +256,7 @@ if (!summary_matches_findings(summary_path)) {
   stop("Stored study summary does not match the findings note.")
 }
 write_linear_table(summary_path, "Sparse bridge/paper/tables/s1-study-summary.tex")
-write_ess_figure(summary_path, "Sparse bridge/paper/figures/ess-against-spacing.pdf")
-cat("Wrote Table 1 and Figure 1 from the stored full-run summary.\n")
+residual_path <- "Sparse bridge/results/s2-study-summary.csv"
+write_ess_figure(summary_path, "Sparse bridge/paper/figures/ess-against-spacing.pdf",
+                 residual_path)
+cat("Wrote Table 1 and Figure 1 from the stored full-run summaries.\n")

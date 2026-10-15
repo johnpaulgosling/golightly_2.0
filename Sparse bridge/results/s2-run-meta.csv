@@ -1,0 +1,2 @@
+"mode","n_replicates","n_prop","seed_base","ode_step","n_discarded_paths","elapsed_seconds","death_check"
+"full",20,500,20251015,0.1,0,1502.073,"pass"
