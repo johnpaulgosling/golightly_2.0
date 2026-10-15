@@ -80,3 +80,39 @@ Place in the paper: the identity is kept. The discrepancy cell is kept as an ill
 Kept: the neighbour equality and the distance count; the time switch; the surrogate target, with the larger posterior error stated; the four scaling cells; the linear Gaussian identity and the Gaussian discrepancy illustration.
 
 Removed as a method: the finite-difference proposal.
+
+## Amendment, 15 October 2026. Study S7
+
+The design is the amendment of the same date in `notes/06-simulation-design.md`. S1 to S6 are unchanged. S7 compares the plain nested filter, the Rao-Blackwellised filter and bootstrap SMC2 on one Lotka–Volterra series. Every number below is copied from a file in `results/`. Posterior means and their replicate standard deviations are quoted to three decimal places. Differences and standard errors are quoted to four decimal places. The verdict does not depend on that rounding: it is the flag in `results/s7-lv-verdict.csv`.
+
+The series has 20 prey observations at times \(2, 4, \ldots, 40\), seed \(20268115\), file `results/s7-lv-data.csv`. Algorithm seeds are the column `seed` in `results/s7-lv-replicates.csv`. The session file `results/s7-lv-session.csv` records R 4.3.3 and an Intel Xeon processor, \(M = 60\), \(N = 12\), \(N_x = 24\) and four replicates.
+
+### Posterior means
+
+From `results/s7-lv-summary.csv`. The figure in parentheses is the replicate standard deviation, divisor \(n - 1\).
+
+| Method | \(\log\theta_1\) | \(\log\theta_2\) | \(\log\theta_3\) | Mean ESS | Mean Euler draws | Mean acceptances |
+| --- | --- | --- | --- | --- | --- | --- |
+| Plain filter | −0.714 (0.122) | −6.035 (0.104) | −1.276 (0.101) | 33.3 | 448500 | 79.25 |
+| Rao-Blackwellised | −0.852 (0.084) | −5.971 (0.159) | −1.196 (0.156) | 42.6 | 476100 | 76.25 |
+| SMC2 | −0.837 (0.064) | −5.977 (0.138) | −1.241 (0.161) | 43.5 | 905700 | 83.25 |
+
+The mean number of proposals is 405 for each method. Euler draws are model integrations. They do not include the observation-density evaluations in the Rao-Blackwellised ratio.
+
+### Shift rule
+
+From `results/s7-lv-shift.csv`. The difference is the plain-filter mean minus the SMC2 mean. The standard error is the one defined in the design amendment.
+
+| Coordinate | Difference | Standard error | Resolved downward | Rao-Blackwellised closer |
+| --- | --- | --- | --- | --- |
+| \(\log\theta_1\) | 0.1227 | 0.0688 | no, and the difference is positive | yes |
+| \(\log\theta_2\) | −0.0586 | 0.0865 | no | yes |
+| \(\log\theta_3\) | −0.0354 | 0.0953 | no | no |
+
+`results/s7-lv-verdict.csv` records the shift verdict as unresolved. The plain-filter means of \(\log\theta_2\) and \(\log\theta_3\) are lower than the SMC2 means, which is the direction reported by Golightly et al. (2026), but neither absolute difference exceeds its standard error. The shift is therefore not reported as appearing, and it is not reported as failing to appear. The Rao-Blackwellised mean is closer to SMC2 on \(\log\theta_2\) and not on \(\log\theta_3\), so the file does not record a reduction on both coordinates. Coordinate \(\log\theta_1\) had no pass mark. The plain-filter mean there is higher than the SMC2 mean by more than the standard error.
+
+The absolute plain-filter gaps on the three coordinates are 0.1227, 0.0586 and 0.0354. The absolute Rao-Blackwellised gaps, from `diff_rb` in the same file, are 0.0152, 0.0055 and 0.0446. The surrogate diagnostic already recorded above as 0.2772671 is quoted in the manuscript to three decimal places, as 0.277. The identity maximum remains 0, as recorded for S6.
+
+The largest replicate floor fraction is 0.008064, on the second Rao-Blackwellised replicate in `results/s7-lv-replicates.csv`. The verdict file marks every method as not exceeding the limit 0.01. The runs are not set aside under that rule. The floor still replaced some non-positive Euler coordinates.
+
+Place in the paper: this is the nonlinear comparison. The ordering in Section 5.2 of Golightly et al. (2026) is not confirmed and is not contradicted. The Monte Carlo error on four replicates, with SMC2 standing in for a particle MCMC gold standard, is too large for the pre-registered rule to resolve a shift of this size. For the manuscript, this amendment replaces the list under "What remains in the paper". The neighbour search, the time switch and the scaling cells stay in the results files and are not contributions. The identity and the surrogate diagnostic stay. The finite-difference proposal stays dropped.

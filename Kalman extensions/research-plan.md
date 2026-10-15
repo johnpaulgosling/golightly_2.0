@@ -47,8 +47,8 @@ Do the phases in order. Do not write code, derivations, or manuscript prose unti
 | 9.1 | Write the reproduction script | done | `scripts/reproduce-nenkf-extensions.R` |
 | 10.1 | Recentre the claim on the two likelihood errors | done | amendment below, 15 October 2026 |
 | 10.2 | Attempt a bound on \(\pi_{\mathrm{knn}}\) against \(\hat{\pi}_{\mathrm{enkf}}\) | done | amendment in `notes/05-theory-notes.md` |
-| 10.3 | Reduced Lotka?Volterra comparison of three targets | in progress | amendment in `notes/06-simulation-design.md` |
-| 10.4 | Revise the manuscript around that comparison | not started | `paper/` |
+| 10.3 | Reduced Lotka?Volterra comparison of three targets | done | `results/s7-lv-summary.csv` and the findings amendment |
+| 10.4 | Revise the manuscript around that comparison | done | `paper/` |
 
 Status values are `not started`, `in progress`, `done`, and `parked`. A parked task needs one sentence in the handover section saying why. Do not mark a task done until its deliverable is in the repository and the acceptance lines for that task hold.
 
@@ -457,6 +457,10 @@ When you stop before a task is done, append a dated subsection here.
 - What is already reliable:
 - What the next agent should not trust:
 - Next action:
+
+### 15 October 2026. Phase 10 completed
+
+The manuscript now centres on the two likelihood errors and the Lotka?Volterra comparison. S7 has been run. The pre-registered verdict is unresolved. Do not rerun S7 in order to obtain a resolved shift, and do not treat the point estimates as a confirmation of Section 5.2 of Golightly et al. (2026). The Ornstein?Uhlenbeck identity files are unchanged.
 
 ## Working rules
 

@@ -1,75 +1,48 @@
 \section{Simulation studies}
 \label{sec:sim}
 
-The latent process is the scalar Ornstein--Uhlenbeck diffusion in Section~5.1 of \citet{golightly2026},
+Two checks are reported. The first is the linear Gaussian identity, on the Ornstein--Uhlenbeck pilot already stored in the results files. The second is the Lotka--Volterra comparison of Section~5.2 of \citet{golightly2026}, at the reduced settings fixed before the run. All algorithms were coded in base R and the Lotka--Volterra runs used R~4.3.3 on an Intel Xeon processor. The pilot is not a reproduction of the 2026 tables.
+
+\subsection{Identity and the surrogate diagnostic}
+
+The identity check uses the scalar Ornstein--Uhlenbeck diffusion of Section~5.1 of \citet{golightly2026}, with \(M = 60\) parameter particles, 16 observations, a fixed ensemble of size 12 and four replicate series. The gold-standard chain on each series has 3000 iterations after a burn-in of 1000. Those choices are smaller than Section~5.1. When the observation variance inside the filter equals the observation variance of the data, \(R_g = R = 0.1\), the log ensemble Kalman increment and the log Rao-Blackwellised increment agree. The maximum absolute difference on each replicate is 0. Lemma~\ref{lem:identity} is the corresponding statement. The correction does not change the weight in this case, and the extra density evaluations have nothing to correct.
+
+The same pilot records the surrogate diagnostic. The mean, over four replicates, of the median absolute difference between a nearest-neighbour increment and a fresh ensemble Kalman increment is 0.277. The threshold fixed before the run was 1. The diagnostic stays inside that threshold. It is not a uniform bound on the log-likelihood, and it is not substituted into the total-variation calculation of Section~\ref{sec:methods}.
+
+The pilot also compared an exact tree with a list and a time-based kernel switch with two fixed kernels, and it compared a finite-difference proposal with a random walk. Those runs are not part of the claim.
+
+\subsection{Lotka--Volterra targets}
+\label{sec:lv}
+
+The latent process is the prey--predator diffusion (25) of \citet{golightly2026}, with drift
 \[
-\mathrm{d}X_t = \theta_1(\theta_2 - X_t)\,\mathrm{d}t + \theta_3\,\mathrm{d}W_t,
+a(x, \theta)
+  = \bigl(\theta_1 x_1 - \theta_2 x_1 x_2,\ 
+          \theta_2 x_1 x_2 - \theta_3 x_2\bigr)
 \]
-with the Gaussian transition printed there. The truth is \(\theta = (1, 2, 1)\), the initial condition is \(x_0 = 10\), and observations at times \(1, \ldots, 16\) follow \eqref{eq:obs} with \(H = 1\) and \(R = 0.1\). The prior is independent, with \(\theta_1 \sim \mathrm{Gamma}(2, 2)\), \(\theta_2 \sim \mathrm{Gamma}(5, 3)\) and \(\theta_3 \sim \mathrm{Gamma}(2, 5)\), in the shape-rate parameterisation. The source paper writes \(\mathrm{Gamma}(a, b)\) and does not name the parameterisation. All series below were simulated from this model, and all algorithms were coded in base R.
+and with the diffusion matrix printed in that section. The observation model is (27): the prey component is observed with a Gaussian density whose mean and variance both equal that component, and the predator component is latent. The truth is \(x_0 = (50, 50)^{\top}\) and \(\theta = (0.5, 0.0025, 0.3)^{\top}\). The prior is independent, \(\theta_1 \sim \mathrm{Gamma}(2, 4)\), \(\theta_2 \sim \mathrm{Gamma}(20, 10^{4})\) and \(\theta_3 \sim \mathrm{Gamma}(2, 4)\), in the shape-rate parameterisation. The source paper writes \(\mathrm{Gamma}(a, b)\) and does not name the parameterisation.
 
-The nested filter uses \(M = 60\), \(N = 12\), \(\gamma = 0.4\) and \(k = 3\). The ensemble size does not adapt. Four replicate series are used. The gold standard for each series is a random-walk Metropolis--Hastings chain on \(\log\theta\), targeting the exact Kalman likelihood, with 3000 iterations after a burn-in of 1000 and with proposal standard deviation 0.15. That chain is much shorter than the \(10^{6}\) iterations used by \citet{golightly2026}, and \(M\), \(T\) and \(N\) are smaller than in their Section~5.1. The posterior means from the pilot should be read with that Monte Carlo error in mind.
+The synthetic path uses Euler--Maruyama with time step \(10^{-3}\) on \([0, 40]\) and is thinned by 2000. Twenty prey observations are kept, at times \(2, 4, \ldots, 40\). The initial condition is treated as known. Inside each filter the transition between observations is ten Euler steps of length 0.2. A coordinate below \(10^{-6}\) is replaced by \(10^{-6}\). The source paper does not state a boundary rule.
 
-The reported error is the absolute difference, averaged over the three coordinates of \(\log\theta\), between the weighted filter mean and the gold-standard mean. Cost is the number of transition draws. Tables~\ref{tab:s2}--\ref{tab:s6} report means over the four replicates.
+Three filters are run on this one series, with four algorithm replicates. The plain nested filter uses \(\tilde{R} = H\hat{\mu}_{t\mid t-1}\) and targets \(\hat{\pi}_{\mathrm{enkf}}\). The Rao-Blackwellised filter multiplies that variance by 2, evaluates \eqref{eq:rb}, and targets \(\tilde{\pi}_{\mathrm{enkf}}\). Bootstrap SMC2 uses the Euler--Maruyama transition as its proposal and the observation density (27) as its state weight. For that discretisation its parameter target is \(\pi_t\). Each filter uses \(M = 60\) and \(\gamma = 0.4\). The ensemble size is fixed at \(N = 12\) for the first two filters. SMC2 uses 24 state particles. There is no delayed acceptance and no growth of \(N\). The rejuvenation proposal is one random walk, with \(\zeta^{2} = 2.56^{2}/3\). Section~5.2 of \citet{golightly2026} used \(M = 1000\), an ensemble that starts at 20 and then grows, 50 replicates, delayed acceptance with three neighbours, and a particle Markov chain Monte Carlo gold standard of \(10^{6}\) iterations. None of those settings is used here. SMC2 is the reference for \(\pi_t\), and it is a noisy one at this state-particle count.
+
+The reported summary is the terminal weighted mean of \(\log\theta_j\). Table~\ref{tab:lv} gives the average of that summary over the four replicates, with the replicate standard deviation in parentheses.
 
 \begin{table}[t]
 \centering
-\caption{Ornstein--Uhlenbeck pilot. Kernel comparison, with means over four replicates. Cost per acceptance is the number of rejuvenation transition draws divided by the number of accepted proposals. ESS denotes the effective sample size.}
-\label{tab:s2}
-\begin{tabular}{lrrrr}
+\caption{Lotka--Volterra comparison. Mean, over four algorithm replicates, of the terminal weighted posterior mean of \(\log\theta_j\), with the replicate standard deviation in parentheses. Draws are the mean number of Euler steps.}
+\label{tab:lv}
+\begin{tabular}{lrrr r r}
 \hline
-Kernel & Abs.\ error & Draws & Cost per acceptance & ESS \\
+Filter & \(\log\theta_1\) & \(\log\theta_2\) & \(\log\theta_3\) & ESS & Draws \\
 \hline
-Metropolis--Hastings & 0.172 & 33855 & 310.4 & 39.6 \\
-Delayed acceptance & 0.126 & 23970 & 221.6 & 43.3 \\
-Switch at \(t = 8\) & 0.132 & 23457 & 214.7 & 36.7 \\
+Plain & $-0.714$ $(0.122)$ & $-6.035$ $(0.104)$ & $-1.276$ $(0.101)$ & 33.3 & 448500 \\
+Rao-Blackwellised & $-0.852$ $(0.084)$ & $-5.971$ $(0.159)$ & $-1.196$ $(0.156)$ & 42.6 & 476100 \\
+SMC2 & $-0.837$ $(0.064)$ & $-5.977$ $(0.138)$ & $-1.241$ $(0.161)$ & 43.5 & 905700 \\
 \hline
 \end{tabular}
 \end{table}
 
-On the pre-registered criterion the switch has the lowest cost per accepted move. Delayed acceptance is close to the switch and is cheaper per acceptance than the plain random walk, and its absolute error is the smallest of the three. The neighbour sets from the list and the tree agreed on every check, 491 checks per replicate on average. The list evaluated a distance to 29460 stored points on average and the tree to 13422.5. Because the neighbour sets agree, the two searches define the same kernel on these runs. The tree evaluates fewer distances at this size. The count does not include the cost of building the tree.
+The pre-registered comparison is the plain-filter mean minus the SMC2 mean, judged against the standard error of that difference. For \(\log\theta_2\) the difference is \(-0.0586\), with standard error 0.0865. For \(\log\theta_3\) the difference is \(-0.0354\), with standard error 0.0953. Both differences are negative, so the point estimates lie in the direction reported by \citet{golightly2026}, and neither absolute difference exceeds its standard error. The shift is unresolved. It is not reported as appearing, and it is not reported as failing to appear. The Rao-Blackwellised mean is closer to the SMC2 mean on \(\log\theta_2\), where the absolute gap is 0.0055 against 0.0586, and not on \(\log\theta_3\), where the absolute gap is 0.0446 against 0.0354. The reduction on both coordinates, which the rule asked for, does not hold.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.85\textwidth]{figures/cost-error.pdf}
-\caption{Ornstein--Uhlenbeck pilot. Mean absolute error in the posterior means of \(\log\theta_i\) against the mean number of transition draws, over four replicates. The finite-difference proposal is included for comparison with the random walk.}
-\label{fig:cost}
-\end{figure}
-
-Figure~\ref{fig:cost} places the runs of Table~\ref{tab:s2} on one scale, together with the surrogate-weight filter and the finite-difference proposal. The finite-difference proposal had mean absolute error 0.074 and mean transition draws 268602, against 0.172 and 33855 for the random walk. Effective sample size per transition draw was 0.000148, against 0.00123 for the random walk. The smaller error does not offset the extra draws under the pre-registered comparison, so the proposal is not taken forward. The acceptance probability included the Gaussian proposal density. The comparison is therefore one of cost for a kernel that still leaves \(\hat{\pi}_{\mathrm{enkf}}\) invariant.
-
-The surrogate-weight filter used 5217 transition draws on average. The mean, over replicates, of the median absolute log difference between the surrogate increment and a fresh ensemble Kalman increment was 0.277, below the threshold of 1. The mean absolute error was 0.293, which is larger than the error of the plain filter and of delayed acceptance. Most of the saving comes from particles that do not run a forecast. The target is \eqref{eq:knn-target}, so the larger error is the discrepancy between that target and \(\hat{\pi}_{\mathrm{enkf}}\).
-
-\begin{table}[t]
-\centering
-\caption{Ornstein--Uhlenbeck pilot. Sample variance of the log ensemble Kalman likelihood at the true parameter, from 20 independent ensembles.}
-\label{tab:s5}
-\begin{tabular}{rrrr}
-\hline
-\(d_y\) & \(N\) & Variance & Mean draws \\
-\hline
-1 & 8 & 14.060 & 128 \\
-1 & 16 & 2.879 & 256 \\
-5 & 8 & 24.935 & 640 \\
-5 & 16 & 10.661 & 1280 \\
-\hline
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:s5} is the scaling comparison that the pilot can support. The five-dimensional series consists of five independent copies of the same diffusion, observed with independent noise. Doubling \(N\) reduces the variance for both observation dimensions. The variance does not fall in proportion to the ratio of those dimensions. Proposition~2 of \citet{katzfuss2018} concerns an example with independent draws from the true forecast. The ensemble used here is interacting, and the reported log-likelihood is a sum over the series. The four cells do not support a boundary at parameter dimension 10 or at observation dimension 10.
-
-\begin{table}[t]
-\centering
-\caption{Ornstein--Uhlenbeck pilot. Rao-Blackwellised weights. The identity row uses \(R_g = R = 0.1\). The other two rows use \(R_g = 0.5\), whilst the data and the gold standard use \(R = 0.1\). Error per draw is the ratio of the mean absolute error to the mean number of draws.}
-\label{tab:s6}
-\begin{tabular}{lrrr}
-\hline
-Filter & Abs.\ error & Draws & Error per draw \\
-\hline
-Plain, \(R_g = 0.5\) & 0.369 & 22776 & \(1.62 \times 10^{-5}\) \\
-Rao-Blackwellised, \(R_g = 0.5\) & 0.169 & 36069 & \(4.68 \times 10^{-6}\) \\
-Rao-Blackwellised, \(R_g = 0.1\) & 0.121 & 31248 & \(3.87 \times 10^{-6}\) \\
-\hline
-\end{tabular}
-\end{table}
-
-When \(R_g = R\), the log ensemble Kalman increment and the log Rao-Blackwellised increment agreed on every replicate: the maximum absolute difference was 0. The correction does not change the weight in that case. When \(R_g = 0.5\) and the true observation variance is 0.1, both densities are Gaussian and \(f \ne g\). The Rao-Blackwellised filter then has the smaller error per draw, at a higher number of transition draws. The comparison uses two Gaussian variances. It is not a nonlinear observation model, and SMC2 was not run on the same series.
+For \(\log\theta_1\), which had no pass mark, the plain-filter mean exceeds the SMC2 mean by 0.1227, with standard error 0.0688. The Rao-Blackwellised gap on that coordinate is 0.0152. The mean number of proposals is 405 in each filter, and the mean numbers of acceptances are 79.25, 76.25 and 83.25. The largest fraction of Euler draws that met the floor is 0.008064, below the limit 0.01 fixed in the design. The draw counts in Table~\ref{tab:lv} do not include the observation-density evaluations inside \eqref{eq:rb}, so they understate the cost of the Rao-Blackwellised weight relative to the plain filter.

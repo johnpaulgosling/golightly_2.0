@@ -14,12 +14,13 @@
 # the algorithm.
 #
 # Displays and the code that writes them:
-#   Table of kernels          summary-s2.csv     run_s1_s2
-#   Neighbour counts          summary-s1.csv     run_s1_s2
-#   Cost against error        paper/figures/cost-error.pdf
-#   Variance table            s5-variance.csv    run_s5
-#   Rao-Blackwellised table   summary-s6.csv     run_s6
-#   Identity differences      s6-identity.csv    run_s6
+#   Ornstein-Uhlenbeck identity   s6-identity.csv     run_s6
+#   Surrogate diagnostic          summary-s4.csv      run_s4
+#   Lotka-Volterra table          s7-lv-summary.csv   s7_run
+#   Lotka-Volterra shift          s7-lv-shift.csv     s7_run
+#   Lotka-Volterra verdict        s7-lv-verdict.csv   s7_run
+# The kernel, tree, variance and finite-difference tables are still
+# written for the findings note. They are not manuscript displays.
 #
 # A full 2026-scale run is not switched on here. Passing
 # --full stops with a message rather than launching that run.
@@ -34,6 +35,9 @@ if ("--full" %in% args) {
 
 source("scripts/ou-pilot-run.R")
 run_all_pilot()
+
+source("scripts/study-s7-lv-targets.R")
+s7_run()
 
 # Figure. Drawn from the summary tables, not from a second analysis.
 root <- pilot_root()
