@@ -9,5 +9,7 @@ Use this list when an implementation follows a paper in `Source papers/`. Open t
 | `Source papers/4992336VoR.pdf` | Sequential Bayesian inference for stochastic epidemic models of cumulative incidence | Sam A. Whitaker, Andrew Golightly, Colin S. Gillespie, and Theodore Kypraios | https://doi.org/10.1214/25-BA1547 |
 | `Source papers/5417950VOR.pdf` | Nested ensemble Kalman filter for static parameter inference in nonlinear state-space models | Andrew Golightly, Sarah E. Heaps, Chris Sherlock, Laura E. Wadkin, and Darren J. Wilkinson | https://doi.org/10.1007/s11222-026-10899-5 |
 | `Source papers/5836428AAM.pdf` | Robust, partially alive particle Metropolis-Hastings via The Frankenfilter | See the PDF for the author list | https://doi.org/10.1080/10618600.2026.2732158 |
+| `Source papers/s11222-014-9469-x.pdf` | Delayed acceptance particle MCMC for exact inference in stochastic kinetic models | See the PDF for the author list | https://doi.org/10.1007/s11222-014-9469-x |
+| `Source papers/rsfs20110047.pdf` | Bayesian parameter inference for stochastic biochemical network models using particle Markov chain Monte Carlo | See the PDF for the author list | See the PDF |
 
 If the algorithm is the user's own write-up and is not one of these papers, cite that write-up instead. Do not force a paper citation onto unrelated code.
