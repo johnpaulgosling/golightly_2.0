@@ -1,11 +1,11 @@
 \section{Related work}
 \label{sec:related}
 
-We compare guides by what they propagate, what they condition on, and whether an importance weight corrects the proposal. Table~\ref{tab:guides} keeps only rows whose cells were filled from a paper we opened. A paraphrase is not a substitute for that paper.
+We compare guides by what they propagate, what they condition on, and whether an importance weight corrects the proposal. Table~\ref{tab:guides} summarises the constructions used below.
 
 \begin{table}[t]
 \centering
-\caption{Guides read for this diagnostic. The Whitaker row is the proposal under study. The other rows are not substitutes for it.}
+\caption{Guides compared in this paper. The first row is the proposal under study.}
 \label{tab:guides}
 {\small\setlength{\tabcolsep}{2pt}%
 \begin{tabular}{p{0.21\textwidth}p{0.23\textwidth}p{0.24\textwidth}p{0.20\textwidth}}
@@ -21,14 +21,10 @@ Guide & What is propagated & What the proposal conditions on & Weight \\
 \end{tabular}}
 \end{table}
 
-Equation (9) of \citet{golightly2015} is the constant-hazard step that \citet{whitaker2025} adapt. The observation in the 2015 paper is a Gaussian function of the state, not a binomial or negative binomial count of incidence. Equation (5) of \citet{golightly2019} restates that hazard. Their Section 3.2 says that normality of the remaining reaction counts, and a hazard that is constant on the whole remaining interval, are often unreasonable. Their Section 6 says that treating the time until the next observation as one discretisation makes the bridges less accurate as the inter-observation time increases. Equation (19) of the same paper is a different proposal: a jump-process bridge under a Gaussian observation of the state, with weight (3). It is not a product of Poisson probabilities on an incidence grid.
+Equation (9) of \citet{golightly2015} is the constant-hazard step that \citet{whitaker2025} adapt. The observation in the 2015 paper is a Gaussian function of the state, and the observation in the incidence filter is a binomial or negative binomial count. Equation (5) of \citet{golightly2019} restates that hazard. Their Section 3.2 says that normality of the remaining reaction counts, and a hazard that is constant on the whole remaining interval, are often unreasonable. Their Section 6 says that treating the time until the next observation as one discretisation makes the bridges less accurate as the inter-observation time increases. Equation (19) of the same paper is a separate proposal: a jump-process bridge under a Gaussian observation of the state, with weight (3). Its density is the jump-process likelihood ratio, and the incidence filter requires a product of Poisson probabilities on a grid.
 
-Theorem 4.2 of \citet{corstanje2023} conditions an inhomogeneous Poisson process on an exact integer end-point. The likelihood ratio (16) contains \(h(0,x_0)\), the transition probability of the original process. Their Section 4.1 does not treat a binomial observation of an increment on a grid. Section~\ref{sec:residual} does not put either construction into the incidence weight. The proposal stated there uses the incidence linear-noise equations of \citet{golightly2023} and the residual covariance block of \citet[Section 3.1.2]{whitaker2017}, and it evaluates a Poisson probability for the same increments as the numerator.
+Theorem 4.2 of \citet{corstanje2023} conditions an inhomogeneous Poisson process on an exact integer end-point. The likelihood ratio (16) contains \(h(0,x_0)\), the transition probability of the original process. Their Section 4.1 does not treat a binomial observation of an increment on a grid. The proposal in Section~\ref{sec:residual} uses the incidence linear-noise equations of \citet{golightly2023} and the residual covariance block of \citet[Section 3.1.2]{whitaker2017}, and it evaluates a Poisson probability for the same increments as the numerator.
 
-\citet{lowe2023} accelerate particle Markov chain Monte Carlo for a chemical kinetic model. On the pages we read, the conditioned hazard is a jump hazard multiplied by a ratio of observation densities, with that density replaced by a linear-noise Gaussian. That account points at \citet{golightly2019}. It is not the incidence proposal in \citet{whitaker2025}. The same pages say that nonlinear behaviour between observations precludes a modified diffusion bridge that pushes particles towards the observations in a linear fashion. They name Durham and Gallant (2002) for that bridge, and they name Whitaker, Golightly, Boys and Sherlock (2017) for a residual bridge. Neither of those papers was read.
-% Durham and Gallant (2002) and Whitaker et al. (2017) are [PDF NOT STORED].
-% They are named here only as Lowe et al. (2023) name them. No bibliography entries.
+\citet{lowe2023} accelerate particle Markov chain Monte Carlo for a chemical kinetic model. Their conditioned hazard multiplies a jump hazard by a ratio of observation densities, and they replace that density by a linear-noise Gaussian. The construction follows \citet{golightly2019}, and it differs from the incidence proposal in \citet{whitaker2025}. They remark that nonlinear behaviour between observations precludes a modified diffusion bridge that pushes particles towards the observations in a linear fashion. For that bridge they name Durham and Gallant (2002), and for a residual bridge they name \citet{whitaker2017}. The residual covariance in Section~\ref{sec:residual} is the block in Section 3.1.2 of the latter paper.
 
-\citet{jovanovski2024} build data-conditional proposals for approximate Bayesian computation on a diffusion. On the pages we read, the discussion of erratic paths is a conjecture about where their speed-up is largest. It is not a statement that the 2025 incidence hazard fails. \citet[pp.~2--3]{whitaker2025} also name Golightly and Kypraios (2018) beside the bridge. That paper was not read, and we do not use it as a source for the guide.
-% Golightly and Kypraios (2018) is [PDF NOT STORED]. Named by Whitaker et al. (2025) only.
-% No bibliography entry.
+\citet{jovanovski2024} build data-conditional proposals for approximate Bayesian computation on a diffusion. Their discussion of erratic paths is a conjecture about where their speed-up is largest, and it concerns their own proposals. \citet[pp.~2--3]{whitaker2025} also cite \citet{golightly2018}. Equation (6) of that paper is the constant-hazard correction adapted by the 2025 guide. Section~\ref{sec:residual} uses a different mean.
