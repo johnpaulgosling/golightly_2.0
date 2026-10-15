@@ -102,8 +102,9 @@ enkf_path_fresh <- function(theta, y, x0, N, dt, R_g, counter, rb = FALSE, R_f =
 
 # Sample covariance of the rows of `others`, scaled by zeta2.
 # Divisor n - 1. Diagonal jitter if the matrix is not positive definite.
-# notes/06-simulation-design.md.
-proposal_covariance <- function(theta_mat, i, zeta2) {
+# notes/06-simulation-design.md. The default jitter is the Ornstein-Uhlenbeck
+# safeguard. The Lotka-Volterra amendment passes a smaller jitter.
+proposal_covariance <- function(theta_mat, i, zeta2, jitter = 1e-4) {
   others <- theta_mat[-i, , drop = FALSE]
   d <- ncol(theta_mat)
   if (nrow(others) < 2) {
@@ -116,13 +117,13 @@ proposal_covariance <- function(theta_mat, i, zeta2) {
   v <- as.matrix(v)
   ev <- eigen(v, symmetric = TRUE, only.values = TRUE)$values
   if (any(!is.finite(ev)) || any(ev <= 1e-10)) {
-    diag(v) <- diag(v) + 1e-4
+    diag(v) <- diag(v) + jitter
   }
   # zeta^2 * V_t^{(-i)}, Section 4.1
   zeta2 * v
 }
 
-draw_random_walk <- function(theta, cov_mat) {
+draw_random_walk <- function(theta, cov_mat, jitter0 = 1e-4) {
   d <- length(theta)
   z <- rnorm(d)
   # epsilon ~ N(0, zeta V), Section 4.1
@@ -137,7 +138,8 @@ draw_random_walk <- function(theta, cov_mat) {
       eps <- t(chol_try) %*% z
       return(theta + as.numeric(eps))
     }
-    jitter <- if (jitter == 0) 1e-4 else jitter * 10
+    # Default jitter0 is the Ornstein-Uhlenbeck safeguard.
+    jitter <- if (jitter == 0) jitter0 else jitter * 10
   }
 }
 

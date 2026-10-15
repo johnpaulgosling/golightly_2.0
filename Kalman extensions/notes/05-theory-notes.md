@@ -185,3 +185,28 @@ The pilot in `notes/06-simulation-findings.md` failed the pre-registered effecti
 - The thresholds \(d_\theta < 10\) and \(d_y > 10\) as a theorem. Not claimed.
 - A general proof that the Rao-Blackwellised filter is worth its cost. Not claimed. The linear Gaussian identity says that, in that case, it is not.
 - The finite-difference Langevin proposal as a method to be used. The acceptance ratio in Section 5.5 still leaves \(\hat{\pi}_{\mathrm{enkf}}\) invariant. The pilot's pre-registered comparison, effective sample size per transition draw, went against the proposal. It is not part of the recommended algorithm.
+
+## Amendment, 15 October 2026. A bound on \(\pi_{\mathrm{knn}}\) against \(\hat{\pi}_{\mathrm{enkf}}\) was not obtained
+
+This amendment does not change the definition of \(\pi_{\mathrm{knn}}\) in Section 5.2, and it does not replace the diagnostic. It records a further attempt to bound the distance between \(\pi_{\mathrm{knn}}\) and \(\hat{\pi}_{\mathrm{enkf}}\). The attempt does not close. No numbered theorem is stated.
+
+The routes below use only the literature summary and the papers already filed. Each one stops before a distance for this algorithm is obtained.
+
+1. Chopin, Jacob and Papaspiliopoulos, Proposition 1, identifies the parameter marginal with the exact posterior only when the product of incremental weights is unbiased for the true likelihood. The nearest-neighbour weight is not unbiased for the ensemble Kalman likelihood. The proposition gives no distance between the two approximate posteriors.
+
+2. Sherlock, Golightly and Henderson, Section 5.1, write that targeting the surrogate invalidates draws from the expensive posterior. They do not bound the difference of the two posteriors.
+
+3. Bon, Lee and Drovandi keep the expensive likelihood as the second-stage target of the mutation. The preprint read in phase 3 states no limit for an algorithm whose incremental weights are the surrogate.
+
+4. Drovandi, Everitt, Golightly and Prangle, Section 3.3, and the Ghurye–Olkin estimator discussed there, concern finite-sample bias of a plug-in Gaussian density. That is not the nearest-neighbour error. Temfack and Wyse use the same estimator for an epidemic observation variance and likewise do not treat a nearest-neighbour weight.
+
+5. A conditional total-variation calculation, derived in this amendment and not attributed to a stored paper. Let \(\ell_1\) and \(\ell_2\) be two fixed log-likelihoods, and let \(\pi_i(\theta) \propto \pi(\theta) \exp(\ell_i(\theta))\), with both normalising constants finite and positive. Suppose \(|\ell_1(\theta) - \ell_2(\theta)| \le \delta\) at every \(\theta\) in the support of the prior. Set \(r(\theta) = \exp(\ell_1(\theta) - \ell_2(\theta))\) and \(\mu = \mathrm{E}_{\pi_2}[r]\). Then \(e^{-\delta} \le r(\theta) \le e^{\delta}\), so \(e^{-\delta} \le \mu \le e^{\delta}\), and the density ratio \(\rho = \pi_1 / \pi_2 = r / \mu\) satisfies \(e^{-2\delta} \le \rho \le e^{2\delta}\). Hence \(|\rho - 1| \le e^{2\delta} - 1\). The total variation distance is half the expectation of \(|\rho - 1|\) under \(\pi_2\), and it is at most 1, so
+   \[
+   \|\pi_1 - \pi_2\|_{\mathrm{TV}}
+     \le \min\bigl(1,\ (e^{2\delta} - 1) / 2\bigr).
+   \]
+   The hypothesis was not established for \(\ell_{\mathrm{knn}}\) and the ensemble Kalman log-likelihood. The pilot diagnostic is a median absolute difference of one increment on eight particles. It is not a uniform bound on the log-likelihood of the series, and it is not \(\delta\) in the display above. Substituting the diagnostic into the display would not be a proof. The calculation also treats both log-likelihoods as fixed functions. \(\pi_{\mathrm{knn}}\) is conditional on a stored cloud, while \(\hat{\pi}_{\mathrm{enkf}}\) is a marginal of an extended target that still contains the ensembles. A fresh ensemble Kalman evaluation is a new draw. The variance cells in `notes/06-simulation-findings.md`, from `results/s5-variance.csv`, are already large relative to a small \(\delta\): the sample variance of the log ensemble Kalman likelihood is 14.059854 at ensemble size 8 in one observation dimension. Katzfuss, Stroud and Wikle, Proposition 2, is an analogy for that variance in a different example. It is not a uniform bound, and it points the wrong way for one: the log-likelihood moves when the ensemble is redrawn.
+
+6. If a single fixed log-likelihood were Lipschitz with constant \(L\), the inverse-distance average in Section 4.2 of Golightly et al. (2026) would have absolute error at most \(L\) times the harmonic mean of the distances to the \(k\) neighbours. The absolute error of the weighted average is at most \(k L / \sum_{i=1}^{k} d_{[i]}^{-1}\), because each neighbour error is at most \(L d_{[i]}\) and the weight \(d_{[i]}^{-1}\) cancels that factor. No stored paper supplies a finite Lipschitz constant for the ensemble Kalman log-likelihood on the support of the Gamma prior. That support is unbounded. The same Lipschitz argument does not apply across two independent ensemble draws. This route stops. No external interpolation paper was required by name in the notes, and none is cited here.
+
+The diagnostic in Section 5.2 remains the comparison that the paper can report. E1 and E2 are unchanged as invariance and cost remarks. The amendment in `research-plan.md` of this date removes them from the claim. It does not make the remarks false.

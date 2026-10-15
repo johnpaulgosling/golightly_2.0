@@ -43,3 +43,26 @@ Copied from the Dropped list in `notes/05-theory-notes.md`, including the amendm
 ## Abstract
 
 One paragraph, 140 to 200 words, no citations and no displayed equations, in the order in `STYLE.md` section 5.2. Keywords after it, three to six, alphabetical, not repeating the title wording.
+
+## Amendment, 15 October 2026. The manuscript is recentred
+
+This amendment replaces the decisions under "Where each extension goes" and the section list. The pilot findings for S1 to S6 stay available. They do not lead the paper.
+
+- Working title: Likelihood targets of a nested ensemble Kalman filter.
+- Venue and voice are unchanged. British spelling. No application section.
+- E1 and E2: not contributions. One sentence may say that the pilot already compared a tree with a list and a time switch with two fixed kernels. No table of those counts in the main text, and no further analysis.
+- E3: remains dropped. One sentence in the discussion, pointing at the findings note, is enough. It is not a results table.
+- E4: main text, as the second of the two errors. The target is \(\pi_{\mathrm{knn}}\). The bound was not obtained. The paper says so and reports the existing diagnostic, the mean of the median absolute log difference. No new surrogate run.
+- E5: not a contribution of the recentred paper. The four variance cells stay in the findings note. The discussion may say that they were measured and that they do not confirm a threshold. They are not a main display.
+- E6: the linear Gaussian identity is a lemma. The Ornstein–Uhlenbeck identity run is the check. The Gaussian discrepancy cell, \(R_g = 0.5\), is not the nonlinear comparison and is not presented as one. A sentence may record that it was a Gaussian illustration.
+- S7: main text. One table of the plain filter, the Rao-Blackwellised filter and SMC2 on the Lotka–Volterra series. The prose states the pre-registered verdict from the findings note and does not add a comparison that the design did not name.
+
+Section list:
+
+1. Introduction, with the contribution being the separation of the two errors and the comparison of \(\hat{\pi}_{\mathrm{enkf}}\), \(\tilde{\pi}_{\mathrm{enkf}}\) and \(\pi_t\) on the nonlinear observation model.
+2. Related work, kept only so far as it separates those targets from SMC2, from ensemble MCMC, and from a surrogate that is used as a screen rather than as a weight.
+3. Methods: the two errors, the three targets, the identity lemma, and the statement that the total-variation route did not close.
+4. Simulation: the identity check, the surrogate diagnostic, and S7.
+5. Discussion: what S7 showed, the missing bound, and the extensions that are not claimed.
+
+The word budget remains at or under 8000 words. The numerical section is the identity, the diagnostic and one Lotka–Volterra table.
