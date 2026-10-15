@@ -38,8 +38,8 @@ Do the phases in order. Do not write code, derivations, or manuscript prose unti
 | 6b.1 | Choose or decline a real application | done | `notes/07-application-choice.md`; declined |
 | 6b.2 | Carry out the chosen application | parked | skipped because 6b.1 declined |
 | 7.1 | Plan the paper | done | `notes/08-presentation-plan.md`; manuscript not drafted |
-| 8.1 | Write the LaTeX manuscript | not started | `paper/` |
-| 9.1 | Write the reproduction script | not started | `scripts/reproduce-sparse-bridge.R` |
+| 8.1 | Write the LaTeX manuscript | done | `paper/main.pdf` |
+| 9.1 | Write the reproduction script | done | `scripts/reproduce-sparse-bridge.R` |
 
 Status values are `not started`, `in progress`, `done`, and `parked`. A parked task needs one sentence in the handover section saying why. Do not mark a task done until its deliverable is in the repository and the acceptance lines for that task hold.
 
@@ -359,6 +359,14 @@ Acceptance: from a clean results directory, the script regenerates the numbers c
 
 ## Handover
 
+### 15 October 2026, manuscript
+
+- Current task: 8.1 and 9.1 are done. Task 5.3 and task 6b.2 stay parked.
+- Files touched: `Sparse bridge/paper/`, `scripts/reproduce-sparse-bridge.R`, and this plan.
+- What is already reliable: `paper/main.pdf` is the diagnostic article allowed by `notes/08-presentation-plan.md`. Its numbers are those in `notes/06-simulation-findings.md`. The reproduction script calls `scripts/study-sparse-bridge-s1.R` and writes Table 2 and Figure 1 from the stored full-run summary.
+- What the next agent should not trust: a mapping from Golightly and Sherlock (2019), equation (19), or from Corstanje et al. (2023), equation (16), into the Algorithm 2 denominator. The pilot CSVs are not the study.
+- Next action: the planned tasks are complete. Do not code a replacement guide. Do not scrape Ebola or COVID-19 counts. Do not convert the manuscript to American spelling unless a submission-ready version is requested.
+
 ### 15 October 2026, continued after the three PDFs were filed
 
 - Current task: 7.1 is done. Phases 8 and 9 have not been started. Task 5.3 and task 6b.2 are parked.
@@ -367,7 +375,7 @@ Acceptance: from a clean results directory, the script regenerates the numbers c
 - What the next agent should not trust: a mapping from Golightly and Sherlock (2019), equation (19), or from Corstanje et al. (2023), equation (16), into the Algorithm 2 denominator. None was written, because the sources do not contain it. The pilot CSVs are not the study. The earlier handover below is out of date on task 3.1.
 - Why 5.3 is parked: neither stored guide evaluates the density of Poisson incidence increments on the dSEIR grid. Details are in the theory note, Section 5.3.
 - Why 6b.2 is parked: the weekly counts are not stored. `notes/07-application-choice.md`.
-- Next action: do not draft `paper/` unless the presentation plan is followed as a diagnostic article with part B left as future work. Do not code a replacement guide without a new source that states the density Algorithm 2 divides by. Do not scrape Ebola or COVID-19 counts.
+- Next action: superseded by the manuscript handover above. The draft has been written. Do not code a replacement guide without a new source that states the density Algorithm 2 divides by. Do not scrape Ebola or COVID-19 counts.
 
 ### 15 October 2026
 

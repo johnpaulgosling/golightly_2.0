@@ -1,0 +1,43 @@
+\section{The 2025 filter and the linear guide}
+\label{sec:filter}
+
+Consider the filter of \citet{whitaker2025}. Let \(X_t\) denote prevalence and let \(N_t\) denote cumulative incidence. The unconditioned hazard is \(h\), and \(H = \mathrm{diag}\{h\}\). A scalar observation \(y_{t_i}\) is a noisy count of one incidence component over \((t_{i-1}, t_i]\), selected by a vector \(P\). In the susceptible-infected-removed applications, \(P' = (1, 0)\). The contact rate enters on the log scale as \(\tilde{\beta}_t\), and we use the precision form printed as equation (2) of \citet{whitaker2025}. The static parameter and the particle index are those of their Algorithm 2. We do not restate the gamma updates of their equations (9)--(11). The diagnostic below does not sample them.
+
+Their Algorithm 2 is printed for the negative binomial observation. The synthetic study in their Section 4.1 uses the binomial observation. They do not print a second algorithm box, and we do not invent one. The observation factor in the weight is the mass function of whichever model is in use. In our simulation that factor is the binomial probability mass function.
+
+\begin{algbox}
+\label{alg:schematic}
+Schematic of Algorithm 2 of \citet{whitaker2025}. The draw from \(q\) in step 1c is the object of the diagnostic. It is not replaced.
+\begin{enumerate}
+\item Propagate each particle. Jitter the observation parameter with the kernel printed for the negative binomial model. Draw the contact-rate path from its transition, which the paper calls a blind propagation. Draw the incidence path from the proposal \(q\), which depends on the next observation.
+\item Resample with the weight in Equation~\eqref{eq:weight}.
+\item Update the sufficient statistic for the rate parameters.
+\item Draw those rate parameters from their conditional posteriors.
+\end{enumerate}
+\end{algbox}
+
+The weight in step 2, for particle \(k\) on the window that ends at the next observation, is
+\begin{equation}
+\label{eq:weight}
+w^{(k)} \propto
+\frac{\pi\bigl(\Delta n^{(k)} \mid \tilde{\beta}^{(k)}, \theta^{(k)}\bigr)\,
+\pi\bigl(y \mid \Delta n^{(k)}, \phi^{(k)}\bigr)}
+{q\bigl(\Delta n^{(k)} \mid \tilde{\beta}^{(k)}, \phi^{(k)}, \theta^{(k)}, y\bigr)}.
+\end{equation}
+The numerator is the time-discretised transition and the observation mass function. It does not contain the conditioned hazard \(h^{*}\). The denominator is \(q\). We read this ratio as an importance weight for one propagate step. We do not add a convergence theorem for the particle filter.
+
+The proposal \(q\) is built in their Section 3.4. At a time \(\tau\) inside the observation window, equation (12) of \citet{whitaker2025} approximates the remaining incidence by a Gaussian whose mean and variance are the current hazard times the remaining time. The observation is given a Gaussian approximation, and the mean inside the observation variance is replaced by the mean of that Gaussian. The display after their equation (18) is the conditioned hazard \(h^{*}\). End-point paths are their forward recursion with \(h\) replaced by \(h^{*}\). The density \(q\) is the product of Poisson probabilities with rates \(h^{*}\Delta\tau\).
+
+The printed correction multiplies by \(\rho P' H\), a row when the observation is scalar. The cross-covariance block that enters the conditional mean of the remaining incidence is a column. For a diagonal \(H\) the row and the column have the same entries. On the susceptible-infected-removed model the shared entries correct the infection component only,
+\begin{equation}
+\label{eq:hstar}
+h^{*}_{\mathrm{inf}}
+= h_{\mathrm{inf}}
++ \rho h_{\mathrm{inf}}
+\frac{y - \hat{\mu}}{\rho^{2} h_{\mathrm{inf}}(t_i - \tau) + \sigma^{2}},
+\qquad
+h^{*}_{\mathrm{rem}} = h_{\mathrm{rem}},
+\end{equation}
+where \(\hat{\mu} = \rho\bigl(n^{\mathrm{past}}_{\mathrm{inf}} + h_{\mathrm{inf}}(t_i - \tau)\bigr)\) and, for the binomial variance evaluated at \(\hat{\mu}\), \(\sigma^{2} = (1-\rho)\hat{\mu}\). Equation~\eqref{eq:hstar} is that scalar form. It matches the entries of the printed display, and it matches equation (9) of \citet{golightly2015} in the case where the stoichiometry is the identity, so that the correction is the column \(HP\). It is not a new guide.
+
+The study in Section~\ref{sec:simulation} does not run the jitter, the blind contact-rate draw, the sufficient-statistic update or the conditional parameter draw. The contact-rate path and the prevalence at the left endpoint of the window are taken from the simulated path, and the removal rate and the reporting probability stay at the simulation values. A particle in Algorithm~\ref{alg:schematic} does not have that information. The diagnostic is about \(h^{*}\) given those paths.

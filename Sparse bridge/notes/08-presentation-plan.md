@@ -51,4 +51,6 @@ The venue guidance in `STYLE.md` section 12 is about 8,000 words, including appe
 
 ## What the drafter still needs
 
-The findings note for every number. The theory note for the algorithm. The literature note for citations. Works marked `[PDF NOT STORED]` are cited only as names in Whitaker et al. (2025), with the sentence saying they were not read. This session does not write `Sparse bridge/paper/`.
+The findings note for every number. The theory note for the algorithm. The literature note for citations. Works marked `[PDF NOT STORED]` are cited only as names in Whitaker et al. (2025), with the sentence saying they were not read.
+
+Amendment, 15 October 2026. The draft allowed by this note is now in `Sparse bridge/paper/`. The choices above are unchanged.
