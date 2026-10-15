@@ -18,9 +18,9 @@ Do the phases in order. Do not write code, derivations, or manuscript prose unti
 
 | ID | Task | Status | Deliverable |
 | --- | --- | --- | --- |
-| 1.1 | Read the nested ensemble Kalman filter paper | not started | `notes/01-paper-context.md` |
-| 1.2 | Extract the open problems in the paper's own words | not started | same file, section "Open problems" |
-| 1.3 | Freeze notation | not started | same file, section "Notation" |
+| 1.1 | Read the nested ensemble Kalman filter paper | done | `notes/01-paper-context.md` |
+| 1.2 | Extract the open problems in the paper's own words | done | same file, section "Open problems" |
+| 1.3 | Freeze notation | done | same file, section "Notation" |
 | 2.1 | Summarise the eight PDFs already in `Literature/` | not started | `notes/02-literature-summary.md` |
 | 2.2 | Build the comparison table of neighbouring methods | not started | same file, section "Comparison" |
 | 3.1 | Obtain and file the missing named sources | not started | new PDFs in `Literature/`, rows in the summary |
