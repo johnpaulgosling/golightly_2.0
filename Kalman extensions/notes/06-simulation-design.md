@@ -62,3 +62,76 @@ Comparators that are not run: vanilla SMC2, ensemble MCMC as a long batch chain,
 - The identity difference (S6) as a single reported maximum.
 
 No plot is required for the pilot. If a figure is drawn, it is the absolute error against transition draws for the methods in the first table.
+
+## Amendment, 15 October 2026. Study S7, three targets on Lotka–Volterra
+
+Written before the posterior run. S1 to S6 are unchanged and are not rerun. S7 is the comparison required by the scope amendment of the same date in `research-plan.md`. A short execution of the functions, used to see that a call returned and to scale the cost, is not a result and is not stored.
+
+### What is compared
+
+On one synthetic series from Section 5.2 of Golightly et al. (2026):
+
+- plain nested filter, weight (13), target \(\hat{\pi}_{\mathrm{enkf}}\), with \(\tilde{R} = H \hat{\mu}_{t \mid t-1}\);
+- Rao-Blackwellised filter, weight (24), target \(\tilde{\pi}_{\mathrm{enkf}}\), with the same \(\tilde{R}\) multiplied by 2, and with \(f\) the observation density (27);
+- vanilla SMC2, target \(\pi_t\), bootstrap proposal, as Section 5.2 describes it: the propagate step is the Euler–Maruyama transition (26) and the state weight equals (27).
+
+The move, when the effective sample size falls below \(\gamma M\), is one symmetric random-walk Metropolis–Hastings proposal. Delayed acceptance is not used. Dynamic ensemble size is off. Neither omission changes the nominal target of a Metropolis–Hastings kernel that evaluates the likelihood the weight uses. Both differ from Section 5.2, which used delayed acceptance with \(k = 3\) and the ensemble-size rule of Section 5.1.
+
+### Settings that match Section 5.2
+
+- Drift and diffusion matrix (25), Euler–Maruyama (26), observation (27) with \(H = (1, 0)\). Prey is observed. Predators are latent.
+- Truth \(X_0 = (50, 50)^\top\), \(\theta = (0.5, 0.0025, 0.3)^\top\).
+- Prior \(\theta_1 \sim \mathrm{Gamma}(2, 4)\), \(\theta_2 \sim \mathrm{Gamma}(20, 10^4)\), \(\theta_3 \sim \mathrm{Gamma}(2, 4)\), independent.
+- Synthetic path step \(10^{-3}\), thinned by 2000, so the observation spacing is 2. Filter step \(\Delta t = 0.2\), hence 10 Euler steps between observations.
+- \(\gamma = 0.4\).
+- \(\zeta^2 = 2.56^2 / d_\theta\), the rule of thumb named in Section 4.1.
+- The Rao-Blackwellised observation variance is twice the plain-filter choice.
+
+### Omissions filled before the run
+
+The PDF does not settle these. The values below are choices, not readings of a printed number.
+
+- \(\mathrm{Gamma}(a, b)\) is shape and rate, the same choice as the Ornstein–Uhlenbeck pilot.
+- The initial condition \(X_0\) is treated as known and is not an observation. The PDF sets \(X_0\) for the synthetic path and says that thinning gives 20 observations. It does not list the time grid. Twenty observations at spacing 2, excluding time 0, are the times \(2, 4, \ldots, 40\). S7 uses that grid, on \([0, 40]\).
+- The PDF does not say whether the 50 replicate runs redraw the latent path. S7 uses one path and several runs of each algorithm.
+- The PDF does not say what happens when an Euler–Maruyama coordinate is not positive. The diffusion matrix (25) is then not a covariance in the form used for a positive population. After every Euler draw, and after every ensemble Kalman analysis update, a coordinate below \(10^{-6}\) is replaced by \(10^{-6}\). Each such Euler draw is counted. If, in a replicate, the number of floored draws exceeds 1% of the Euler draws, that method's replicate is not interpreted as a pure use of (26).
+- The random-walk covariance adds \(10^{-12}\) to each diagonal entry when an eigenvalue is at most \(10^{-10}\). The Cholesky factor used to draw the proposal starts its extra diagonal term at \(10^{-12}\). The Ornstein–Uhlenbeck pilot's \(10^{-4}\) would dominate the \(\theta_2\) margin. This jitter is a numerical safeguard, not part of Section 4.1.
+- Resampling inside Algorithm 1 is the printed per-particle draw. The outer resample is with replacement, one draw per parameter particle.
+
+### Settings that differ from Section 5.2
+
+| Item | Section 5.2 | S7 |
+| --- | --- | --- |
+| Parameter particles \(M\) | 1000 | 60 |
+| Ensemble or state particles | initial \(N = 20\), then the Section 5.1 growth rule; Table 2 terminates at 20, 40 and 88 | fixed \(N = 12\) for the plain filter and the Rao-Blackwellised filter; fixed \(N_x = 24\) state particles for SMC2 |
+| Replicates | 50 | 4 algorithm replicates on one series |
+| Delayed acceptance, \(k = 3\) | used for all three schemes | not used |
+| Dynamic \(N\) | on | off |
+| Gold standard | particle MCMC, \(10^6\) iterations, 100 state particles | not run |
+
+SMC2 is the reference for \(\pi_t\) inside this study. It is not a substitute of the same quality as the particle MCMC gold standard. Its Monte Carlo error, and the bias from a fixed \(N_x = 24\), remain in every comparison with it.
+
+### Seeds
+
+The seed is not part of the algorithm. Master seed 20261015. The series uses seed \(20261015 + 7100\). Method index \(s = 1, 2, 3\) for the plain filter, the Rao-Blackwellised filter and SMC2. Replicate \(r \in \{1, 2, 3, 4\}\) uses seed \(20261015 + 8100 + 100 s + r\).
+
+### Rule for the shift, fixed before the run
+
+Let \(m(a, j)\) be the average, over the four replicates, of the terminal weighted mean of \(\log \theta_j\) under algorithm \(a\). The weighted mean uses the terminal normalised parameter weights. Let \(s(a, j)\) be the sample standard deviation of those four replicate means, with divisor \(n - 1\). The standard error of \(m(\mathrm{nenkf}, j) - m(\mathrm{smc2}, j)\) is
+\[
+\sqrt{\bigl(s(\mathrm{nenkf}, j)^2 + s(\mathrm{smc2}, j)^2\bigr) / 4}.
+\]
+Table 2 of Golightly et al. (2026) reports estimators of \(\mathrm{E}(\log \theta_i)\). The prose of Section 5.2 says that the plain filter shifts the posterior means of \(\theta_2\) and \(\theta_3\) downward. S7 follows the table and applies the rule to \(\log \theta_2\) and \(\log \theta_3\).
+
+- The downward shift is resolved on coordinate \(j\) if \(m(\mathrm{nenkf}, j) - m(\mathrm{smc2}, j)\) is negative and its absolute value exceeds the standard error above.
+- The shift is reported as appearing if it is resolved on both \(j = 2\) and \(j = 3\).
+- It is reported as failing to appear if the plain-filter mean is greater than or equal to the SMC2 mean on both of those coordinates.
+- Otherwise it is unresolved.
+- The Rao-Blackwellised filter reduces the discrepancy on coordinate \(j\) if \(|m(\mathrm{rb}, j) - m(\mathrm{smc2}, j)| < |m(\mathrm{nenkf}, j) - m(\mathrm{smc2}, j)|\). Whether this holds on both \(j = 2\) and \(j = 3\) is reported as a description of these runs. It is not a confirmation of the ordering in Section 5.2, because the settings differ and there is no particle MCMC gold standard.
+- Coordinate \(j = 1\) is reported with the same arithmetic and without a pass mark.
+
+Also recorded, for each replicate: terminal effective sample size, number of Euler draws, number of floored Euler draws, number of proposals, number of acceptances. Wall-clock time is not a primary metric.
+
+### Output files
+
+`results/s7-lv-data.csv`, `results/s7-lv-replicates.csv`, `results/s7-lv-summary.csv`, `results/s7-lv-shift.csv`, `results/s7-lv-verdict.csv`, `results/s7-lv-session.csv`. The verdict file applies only the rule in this amendment.

@@ -45,6 +45,10 @@ Do the phases in order. Do not write code, derivations, or manuscript prose unti
 | 7.1 | Plan the paper | done | `notes/08-presentation-plan.md` |
 | 8.1 | Write the LaTeX manuscript | done | `paper/` |
 | 9.1 | Write the reproduction script | done | `scripts/reproduce-nenkf-extensions.R` |
+| 10.1 | Recentre the claim on the two likelihood errors | done | amendment below, 15 October 2026 |
+| 10.2 | Attempt a bound on \(\pi_{\mathrm{knn}}\) against \(\hat{\pi}_{\mathrm{enkf}}\) | done | amendment in `notes/05-theory-notes.md` |
+| 10.3 | Reduced Lotka?Volterra comparison of three targets | done | `results/s7-lv-summary.csv` and the findings amendment |
+| 10.4 | Revise the manuscript around that comparison | done | `paper/` |
 
 Status values are `not started`, `in progress`, `done`, and `parked`. A parked task needs one sentence in the handover section saying why. Do not mark a task done until its deliverable is in the repository and the acceptance lines for that task hold.
 
@@ -424,6 +428,26 @@ Document, in a header comment, how to run it from the repository root and what i
 
 Acceptance: from a clean results directory, the script regenerates the numbers cited in the manuscript. Check this once and record the command in the script header.
 
+## Amendment, 15 October 2026. The paper is recentred on two targets
+
+This amendment replaces the centre of the default shape in "Default shape of the eventual paper". That paragraph put the resample-move step, extensions E1, E2 and E3, at the centre. The manuscript that was drafted from the pilot is a collection of those remarks, and it is too close to sentences already in Golightly et al. (2026).
+
+The claim is now the separation of two errors, and a comparison of the three parameter targets those errors induce.
+
+1. The ensemble Kalman likelihood differs from the true likelihood. The plain nested filter targets \(\hat{\pi}_{\mathrm{enkf}}\).
+2. The nearest-neighbour incremental weight differs from the ensemble Kalman likelihood. It targets \(\pi_{\mathrm{knn}}\).
+3. The Rao-Blackwellised weight puts the true observation density back. Its target is \(\tilde{\pi}_{\mathrm{enkf}}\), which is still not the exact posterior \(\pi_t\). Vanilla SMC2, with a bootstrap proposal, is the comparator that targets \(\pi_t\).
+
+E1, the KD-tree neighbour search, and E2, the time-based kernel switch, leave the claim. The pilot already ran them. They may be named as a completed pilot, or as future work. They are not expanded and they are not rerun. E3, the finite-difference proposal, stays dropped, as the amendment of the same date in `notes/05-theory-notes.md` already records. The linear Gaussian identity stays as a check that the Rao-Blackwellised weight equals the ensemble Kalman weight when \(f = g\). The Ornstein?Uhlenbeck result files stay in `results/`.
+
+## Amendment, 15 October 2026. The nonlinear comparison is Lotka?Volterra
+
+This amendment chooses the example for the comparison in the previous amendment. It does not change that comparison's scientific question.
+
+The example is the Lotka?Volterra diffusion in Section 5.2 of Golightly et al. (2026), with the nonlinear Gaussian observation whose variance equals the prey mean. The design, including every setting that differs from that section, is the amendment of the same date in `notes/06-simulation-design.md`. It is written before the posterior run.
+
+The following are not run. Lorenz-96 at the published dimension \(d = 10\) is declined because Section 5.4 of the 2026 paper reports 147 minutes for one nested-filter run and 2737 minutes for SMC2. The Ebola and COVID-19 series are declined because `notes/07-application-choice.md` already declines a new data set, and because Temfack and Wyse, arXiv:2512.05650v4, already study a nested ensemble scheme for epidemics. The literature summary dates that preprint 18 May 2026. Lotka?Volterra remains a simulation comparison, not a new data set.
+
 ## Handover
 
 When you stop before a task is done, append a dated subsection here.
@@ -433,6 +457,10 @@ When you stop before a task is done, append a dated subsection here.
 - What is already reliable:
 - What the next agent should not trust:
 - Next action:
+
+### 15 October 2026. Phase 10 completed
+
+The manuscript now centres on the two likelihood errors and the Lotka?Volterra comparison. S7 has been run. The pre-registered verdict is unresolved. Do not rerun S7 in order to obtain a resolved shift, and do not treat the point estimates as a confirmation of Section 5.2 of Golightly et al. (2026). The Ornstein?Uhlenbeck identity files are unchanged.
 
 ## Working rules
 
