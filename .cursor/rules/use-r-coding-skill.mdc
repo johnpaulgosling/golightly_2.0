@@ -1,0 +1,18 @@
+---
+description: "Before writing or editing R, read the r-coding skill and implement algorithms in commented base R."
+alwaysApply: true
+---
+
+Computational work in this repository is R that stays lined up with an algorithm.
+
+Before you create, edit, review, or debug R, including when no `.R` file exists yet, read `.cursor/skills/r-coding/SKILL.md` and follow it. The skill is `r-coding`. Invoke it for simulation, MCMC, filtering, ABC, state-space models, stochastic kinetic models, epidemic models, and any other numerical code.
+
+These constraints hold for that work:
+
+- Write the code in R.
+- Use base R. Do not add a package on your own initiative. Ask first, and say which algorithm step base R cannot express.
+- Comment each step so a reader can match it to the algorithm: step number, equation or draw, and the source section you actually used.
+- Translate the algorithm in order, with explicit loops and one named quantity per line. A slower file that matches the algorithm is the version to keep.
+- Keep those comments when you edit. They are part of the implementation.
+
+Paper filenames and DOIs are in `.cursor/skills/r-coding/references/source-papers.md`. Start a new algorithm file from `.cursor/skills/r-coding/assets/algorithm-template.R`.
