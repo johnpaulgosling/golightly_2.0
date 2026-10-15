@@ -54,3 +54,5 @@ The venue guidance in `STYLE.md` section 12 is about 8,000 words, including appe
 The findings note for every number. The theory note for the algorithm. The literature note for citations. Works marked `[PDF NOT STORED]` are cited only as names in Whitaker et al. (2025), with the sentence saying they were not read.
 
 Amendment, 15 October 2026. The draft allowed by this note is now in `Sparse bridge/paper/`. The choices above are unchanged.
+
+Further amendment, 15 October 2026, after the residual guide. Part B is main text. The residual incidence guide is Section 4 of the manuscript in source order after the diagnostic, and study S2 is in the simulation section. The pre-registered comparison holds: the residual median effective sample size at spacing 5 is larger than the stored linear median. The manuscript also reports that this median mixes a weak first window with a strong second window. Equation (19) of Golightly and Sherlock (2019) and Theorem 4.2 of Corstanje et al. (2023) stay out of the denominator. The title is no longer the diagnostic-only title in the list above.

@@ -72,11 +72,14 @@ dsir_ess_valid_only <- function(log_w) {
 }
 
 # N_prop incidence paths on one window.
-# guide = "linear" uses h*. guide = "myopic" uses h. The weight is Algorithm 2, step 2.
+# guide = "linear" uses h*. guide = "myopic" uses h.
+# guide = "residual" uses the Poisson means from R/dsir-lna-guide.R.
+# The weight is Algorithm 2, step 2, for every guide.
 # beta_left[j] is log contact rate at substep j-1, supplied by the caller.
 # The function does not draw the contact rate and does not set a seed.
+# ode_step is used only by the residual guide.
 dsir_window_weights <- function(s0, i0, beta_left, gamma, rho, y,
-                               delta_tau, n_prop, guide) {
+                               delta_tau, n_prop, guide, ode_step = 0.1) {
   m <- length(beta_left)
   log_w <- rep(-Inf, n_prop)
   n_invalid <- 0
@@ -100,6 +103,18 @@ dsir_window_weights <- function(s0, i0, beta_left, gamma, rho, y,
         )
         rate_inf <- h_star$h_star_inf * delta_tau
         rate_rem <- h_star$h_star_rem * delta_tau
+      } else if (guide == "residual") {
+        # Residual incidence guide. Poisson means, not the diffusion density.
+        residual <- dsir_residual_poisson_means(
+          s, i, beta_left[j + 1], gamma, n_past,
+          remaining, delta_tau, y, rho, ode_step
+        )
+        if (!isTRUE(residual$ok)) {
+          invalid <- TRUE
+          break
+        }
+        rate_inf <- residual$mean_inf
+        rate_rem <- residual$mean_rem
       } else {
         rate_inf <- h$h_inf * delta_tau
         rate_rem <- h$h_rem * delta_tau
@@ -128,6 +143,7 @@ dsir_window_weights <- function(s0, i0, beta_left, gamma, rho, y,
       if (guide == "myopic") {
         log_q <- log_pi
       } else {
+        # log q for linear and residual: product of Poisson PMFs at the sampled rates.
         log_q <- log_q + dpois(dn_inf, rate_inf, log = TRUE) +
           dpois(dn_rem, rate_rem, log = TRUE)
       }

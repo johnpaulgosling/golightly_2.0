@@ -12,7 +12,7 @@ For each replicate, each spacing and each guide, the within-replicate summary is
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.72\textwidth]{figures/ess-against-spacing.pdf}
-\caption{Effective sample size against observation spacing. Filled circles: linear guide, the medians in Table~\ref{tab:s1}. Open circles: myopic comparator, which is not the prediction. The myopic values are those stated in the text.}
+\caption{Effective sample size against observation spacing. Filled circles: linear guide, the medians in Table~\ref{tab:s1}. Open circles: myopic comparator. Triangles: residual guide, the medians in Table~\ref{tab:s2}. The prediction for the residual guide is the comparison at spacing 5 with the linear median, not the slope of the triangle series.}
 \label{fig:ess}
 \end{figure}
 
@@ -21,3 +21,11 @@ From Table~\ref{tab:s1}, the linear median effective sample size is 149.66067929
 At spacing 1 the myopic median is 139.525563697813. At spacing 2 it is 142.824313796391. At spacing 5 it is 195.181391518181. The myopic median does not fall as the spacing grows.
 
 Two qualifications belong with the comparison. The guide was given the simulated prevalence and the simulated contact-rate path. The result is about \(h^{*}\) given those paths. At spacing 1 the linear median is 149.660679297905 out of 500 draws, so the guide is already uneven on the published grid. The prediction was the comparison across spacings, not a claim that the published grid is unaffected. The comparison does not measure a pathwise distance to the true conditioned process, and it does not say whether a filtering distribution would change.
+
+The residual guide of Section~\ref{sec:residual} was run on the same mechanism, the same seeds and the same observation draws. The linear proposals were not redrawn. Twenty replicates and 500 draws were used again. The ordinary differential equations were integrated with a Runge--Kutta step of length 0.1. No fine-grid path was discarded. The run took 1502.073 seconds. The prediction, fixed before this run, was that the residual median effective sample size at spacing 5 would be larger than 2.05670742297318. With two windows, the within-replicate median is the average of the two window values. That is the same functional as the linear summary at spacing 5.
+
+\input{tables/s2-study-summary.tex}
+
+From Table~\ref{tab:s2}, the residual median is 281.708848707666 at spacing 1, 236.47088660943 at spacing 2 and 169.453475371897 at spacing 5. The spacing-5 value is larger than 2.05670742297318, so the prediction holds. The residual median declines as the spacing grows. It does not fall to the linear value. At spacing 5 the median on the finite weights is 173.333046076685, so the zero-weight rule shifts the summary by a small amount beside that gap. The median proportion of invalid draws is 0.0287 at spacing 1, 0.0096 at spacing 2 and \(5 \times 10^{-4}\) at spacing 5.
+
+That last proportion is a median across replicates, and it hides a split between the two windows. In the stored window file, five of the twenty first windows at spacing 5 have every one of the 500 residual draws invalid. The median effective sample size of those twenty first windows is 5.87283517539277. The median of the twenty second windows is 331.985239567309. These two medians were not the pre-registered summary. They are descriptions of the stored windows. The linear guide, on the same spacing, has median effective sample size 1.36201529794476 on the first window and 1.61726241454208 on the second, and no linear window has effective sample size 0. The pre-registered residual number at spacing 5 therefore mixes a weak first window with a much stronger second window. The comparison with 2.05670742297318 uses the functional named before the run. Figure~\ref{fig:ess} adds the three residual medians from Table~\ref{tab:s2} to the linear and myopic series.

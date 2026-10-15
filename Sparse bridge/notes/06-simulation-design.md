@@ -87,3 +87,48 @@ The findings note may cite only these files. A figure is not required for the cl
 ### Pilot switch
 
 The script accepts an argument, defaulting to the full design above. The pilot is pre-registered here and is not a substitute for the full run. It uses two replicates, \(N_{\mathrm{prop}} = 50\), the same spacings, the same seed rule, and writes `s1-pilot-` prefixed files. Those files are not cited by the findings note. The pilot exists so a later session can check that the script finishes. It was declared before either run.
+
+## Amendment, 15 October 2026. Study S2
+
+The sentence above that S2 is not designed is superseded by this amendment. S1 is unchanged. S2 was not run when this amendment was written.
+
+The proposal is the residual incidence guide stated in `notes/05-theory-notes.md`, Section 5.3, as amended on this date. It replaces \(q\) only. The numerator of the Algorithm 2 weight stays the dSIR transition times the binomial probability.
+
+Question. On the same Section 4.1 mechanism as S1, is the median effective sample size of the residual guide at spacing 5 larger than the stored linear-guide median at spacing 5?
+
+The stored linear median is 2.05670742297318, from `s1-study-summary.csv`. It is not recomputed. The prediction uses that number as the bar. It was fixed before any residual effective sample size was stored.
+
+What would count as the prediction failing. The residual median defined below is not larger than 2.05670742297318. The findings note then qualifies the claim. The spacings, \(N_{\mathrm{prop}}\), the numerical ODE step and the invalid-draw rule are not changed after the output is seen.
+
+### What is held from S1
+
+The data-generating mechanism, the three spacings, the substep \(\Delta\tau = 0.1\), the supplied prevalence and contact-rate path, \(N_{\mathrm{prop}} = 500\), the twenty replicates and the seed rule are those of S1. Replicate \(r\) is simulated from seed \(20251015 + r\), with the same retry rule. Binomial observations are drawn in spacing order 1, 2, 5, and then the residual proposals are drawn in that spacing order. The linear and myopic proposals of S1 are not redrawn, so this script does not continue their random stream. The paths and the observations match S1 because those draws occur before either script's proposals.
+
+### Numerical step
+
+The incidence ODE and the linear-noise variance are integrated by a classical Runge–Kutta step of length 0.1. That length is not a step in Golightly et al. (2023). It was fixed after comparing the end mean and variance, on the Section 4.1 initial state over an interval of length 5, with a step of 0.02. The relative differences were smaller than \(10^{-3}\). They are not retuned from the effective sample size.
+
+A separate check, run before the proposals, integrates a pure death process with removal rate 0.5 from 10 infectives over an interval of length 5. The end removal count is compared with \(10(1 - e^{-2.5})\). The script stops if the absolute error exceeds \(10^{-4}\).
+
+### Invalid draw
+
+The S1 rule applies. In addition, the weight is 0 if the restarted integration stops because a prevalence on the ODE would be negative, if the determinant of the fundamental matrix at the next substep is smaller than \(10^{-12}\) in absolute value, or if either Poisson mean is negative or is not finite. A negative mean is not replaced by 0.
+
+### Summary
+
+The within-replicate summary and the study summary are defined as in S1, for the residual guide only. The prediction is the comparison of `median_ess` at spacing 5 with 2.05670742297318.
+
+Secondary columns, stored and not used as a second prediction: the median of the valid-only ESS, the median proportion of invalid draws, and the same medians at spacings 1 and 2.
+
+### Output
+
+Written by `scripts/study-sparse-bridge-s2.R`.
+
+| File | Contents |
+| --- | --- |
+| `Sparse bridge/results/s2-window-ess.csv` | One row per replicate, spacing and window |
+| `Sparse bridge/results/s2-replicate-summary.csv` | One row per replicate and spacing |
+| `Sparse bridge/results/s2-study-summary.csv` | One row per spacing, the medians above |
+| `Sparse bridge/results/s2-run-meta.csv` | Seed rule, \(N_{\mathrm{prop}}\), ODE step, discarded fine paths, wall clock |
+
+The pilot switch uses two replicates and \(N_{\mathrm{prop}} = 50\), and writes `s2-pilot-` prefixed files. Those files are not cited by the findings note.

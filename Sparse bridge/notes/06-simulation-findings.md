@@ -32,4 +32,32 @@ The guide was given the simulated state and the simulated contact path. A partic
 
 At spacing 1 the linear median ESS is 149.660679297905 out of 500 draws. The guide is already uneven on the published grid. The prediction was the comparison across spacings, not a claim that the published grid is unaffected.
 
-The result does not supply a numerical threshold, and it does not measure a pathwise distance to the true conditioned process. Part B remains dropped. Nothing from the "Dropped" list in the theory note is reinstated.
+The result does not supply a numerical threshold, and it does not measure a pathwise distance to the true conditioned process. The linear-guide rows are not replaced by the residual guide below.
+
+## S2. What was compared
+
+The amendment in `notes/06-simulation-design.md` fixes the comparison. The mechanism, the spacings, the twenty replicates and the seed rule are those of S1. Binomial observations are drawn before the residual proposals. The linear proposals are not redrawn. The prediction was that the median, across replicates, of the within-replicate median window ESS of the residual guide at spacing 5 would be larger than 2.05670742297318, the stored linear median at that spacing.
+
+The numerical step for equations (4), (8) and (9) of Golightly et al. (2023) was 0.1. The pure-death check passed (`s2-run-meta.csv`, `death_check`). No fine-grid path was discarded. The run took 1502.073 seconds (`elapsed_seconds`).
+
+With two windows, the within-replicate median is the average of the two window values. That is the median R returns for an even count of two, and it is the same functional as the linear spacing-5 summary.
+
+## S2. Result
+
+From `s2-study-summary.csv`, residual guide, column `median_ess`:
+
+| Spacing | Median ESS | Median ESS on finite weights | Median proportion invalid |
+| --- | --- | --- | --- |
+| 1 | 281.708848707666 | 281.708848707666 | 0.0287 |
+| 2 | 236.47088660943 | 236.47088660943 | 0.0096 |
+| 5 | 169.453475371897 | 173.333046076685 | 5e-04 |
+
+The value at spacing 5 is larger than 2.05670742297318. The prediction holds. The residual median declines from spacing 1 to spacing 5. It does not fall to the linear-guide value.
+
+At spacing 5, `median_ess` and `median_ess_valid` differ. The file records 169.453475371897 and 173.333046076685. The difference is small beside the gap from the linear median. The median invalid proportion at spacing 5 is the stored value 5e-04.
+
+That median proportion does not describe every replicate. In `s2-window-ess.csv`, at spacing 5, five of the twenty first windows have `n_invalid` equal to 500, so every residual draw in that window has weight zero. The second window in each of those replicates has `n_invalid` 0. The median ESS of the twenty first windows is 5.87283517539277. The median ESS of the twenty second windows is 331.985239567309. These two medians are descriptions of the stored window file. They were not the pre-registered summary. The linear guide, in `s1-window-ess.csv`, has median ESS 1.36201529794476 on the first window at spacing 5 and 1.61726241454208 on the second, and no window has ESS 0.
+
+The pre-registered residual number at spacing 5 therefore mixes a weak first window with a much stronger second window. The comparison with 2.05670742297318 still uses the functional named before the run.
+
+No gold-standard posterior was computed. The Ebola and COVID-19 series remain unused.

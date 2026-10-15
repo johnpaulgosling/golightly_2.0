@@ -103,15 +103,43 @@ Will appear in the paper as this diagnostic, not as a threshold and not as a the
 
 ## 5.3 Part B
 
-Not attempted. The scope decision in `notes/04-theory-agenda.md` parks part B.
+Amendment, 15 October 2026. The scope decision that parked part B used the three guides then stored. The files added after that decision are summarised in `notes/02-literature-summary.md`. This section states one replacement. It does not claim that any one of those papers already prints the replacement inside Algorithm 2.
 
-Golightly and Sherlock (2019), equation (19), samples a Markov jump process with the linear-noise conditioned hazard, and the weight (3) is the jump-process likelihood ratio under a Gaussian observation of the state. Whitaker et al. (2025), Algorithm 2, divides by the density of Poisson incidence increments on a fixed grid. Equation (19) does not provide that density. Corstanje et al. (2023), Theorem 4.2, gives the likelihood ratio (16) for an inhomogeneous Poisson process conditioned on an exact integer end-point, and (16) contains \(h(0, x_0)\). Section 4.1 of that paper does not evaluate a binomial observation of an increment. Neither density can be placed in the Algorithm 2 denominator without a mapping the source does not contain. No modified algorithm is stated.
+### What is still not a density for \(q\)
+
+Golightly and Sherlock (2019), equation (19), samples a Markov jump process, and the weight (3) is the jump-process likelihood ratio under a Gaussian observation of the state. Corstanje et al. (2023), Theorem 4.2, and Corstanje (2024), Corollary 4.3.6 and Theorem 4.4.2, give path-space likelihood ratios for a guided jump process conditioned on an exact end-point or an exact linear image of the state. Those ratios are not products of Poisson probabilities for dSIR increments on a grid of width \(\Delta\tau\). Whitaker et al. (2017), equations (15) and (25), are Gaussian densities for a diffusion skeleton. None of those expressions is placed in the Algorithm 2 denominator.
+
+Golightly and Kypraios (2018), equation (6), is the constant-hazard correction already adapted by Whitaker et al. (2025). It is not a second proposal.
+
+### The residual incidence guide
+
+The draw stays a pair of Poisson increments, and \(q\) stays the product of those Poisson probabilities, as on p. 12 of Whitaker et al. (2025). The numerator of the Algorithm 2 weight is unchanged. The change is the Poisson mean.
+
+At a substep with current prevalence \((s, i)\), log contact rate \(\tilde{\beta}\), infections already proposed in the window \(n^{\mathrm{past}}\), remaining time \(t_i - \tau\), step \(\Delta\tau\) and observation \(y\):
+
+1. Restart the incidence linear-noise approximation at \((s, i)\). The incidence coordinate \(\eta\) starts at 0, the fundamental matrix \(G\) starts at the identity, and the residual variance \(V\) starts at 0. The contact rate \(\exp(\tilde{\beta})\) is held fixed on this restart. Integrate equations (4), (8) and (9) of Golightly, Wadkin, Whitaker, Baggaley, Parker and Kypraios (2023) from 0 to \(\Delta\tau\) and from 0 to \(t_i - \tau\). The Jacobian is the matrix printed after their equation (6), with the restart prevalence in place of \((s_0, i_0)\). The restart is the one they describe after their equation (19), which they attribute to Fearnhead, Giagos and Sherlock (2014). Section 4.2 of that 2014 paper is where the restart is stated: the ODE is re-initialised at the start of each interval.
+
+2. The mean of the binomial observation uses the linear-noise mean of remaining infections, \(\eta_1(t_i - \tau)\), in place of the frozen product \(h_{\mathrm{inf}}(t_i - \tau)\). The variance stays equation (14) of Whitaker et al. (2025), \(\sigma^{2} = (1 - \rho)\hat{\mu}\), with \(\hat{\mu} = \rho\bigl(n^{\mathrm{past}} + \eta_1(t_i - \tau)\bigr)\). For \(P' = (1, 0)\) this is the binomial variance in equation (22) of Golightly et al. (2023).
+
+3. Let \(R\) be the residual incidence, with mean 0 and variance \(V\) under the restart. The covariance of the residual at time \(\Delta\tau\) with the residual at the end of the remaining interval is \(V_{\Delta\tau}(G_{t_i-\tau} G_{\Delta\tau}^{-1})'\). Whitaker, Golightly, Boys and Sherlock (2017), Section 3.1.2, write the same block as \(P_t \psi_t P_T'\) after their display (24). The observation loads on the infection component by \(\rho\). The conditional mean of the infection residual at \(\Delta\tau\) is that infection covariance times \(\rho(y - \hat{\mu})\) divided by \(\rho^{2} V_{11}(t_i - \tau) + \sigma^{2}\). The removal component is not shifted. That matches the scalar SIR form in Section 5.1, where the correction is added to the infection hazard only.
+
+4. The Poisson mean for infections over the next step is the ODE increment \(\eta_1(\Delta\tau)\) plus that conditional residual mean. The Poisson mean for removals is the ODE increment \(\eta_2(\Delta\tau)\). Both are means of counts, not rates multiplied again by \(\Delta\tau\). Draw the increments from those Poisson distributions. The factor \(q\) in the weight is the product of the two Poisson probabilities, and of the same factors at later substeps.
+
+A draw is invalid, and its weight is zero, when the integration stops because a prevalence along the ODE would be negative, when the determinant of \(G_{\Delta\tau}\) is smaller than \(10^{-12}\) in absolute value, when either Poisson mean is negative or is not finite, or when the updated \(s\) or \(i\) would be negative. A negative mean is not replaced by zero. The 2019 truncation of equation (5) is not copied here.
+
+The numerical step used to integrate (4), (8) and (9) is 0.1. It is fixed in the S2 amendment of the design note. It is not a step in Golightly et al. (2023).
+
+### What this claims
+
+On the printed weight, the importance target of one propagate step stays the dSIR transition times the binomial probability. The residual guide changes \(q\). It is the proposal whose evaluated density is the density of the same incidence increments that the numerator describes. No convergence theorem is added.
+
+The prediction for this proposal is the one in the S2 amendment of the design note. It is not a claim that the filtering distribution of \(\gamma\) or \(\rho\) changes.
 
 ## 5.4 Dropped
 
 Phase 6 does not simulate these, and a manuscript does not present them as methods.
 
-- A replacement of \(q\) by Golightly and Sherlock (2019), equation (19), or by the guided process in Corstanje et al. (2023), Theorem 4.2. Parked in task 4.2. The densities are not the density Algorithm 2 divides by.
+- A replacement of \(q\) by Golightly and Sherlock (2019), equation (19), or by the guided process in Corstanje et al. (2023), Theorem 4.2. Those densities are not the density Algorithm 2 divides by. The residual incidence guide in Section 5.3 is a different proposal, and it is not on this list.
 - Dropping \(h(0, x_0)\) from the ratio (16). Theorem 4.2 keeps that factor.
 - Truncating a negative \(h^{*}\) to zero and calling the result the 2025 guide. The 2019 paper truncates equation (5). The 2025 display does not.
 - A numerical spacing at which the 2025 guide fails. No opened paper states one for dSEIR incidence.
