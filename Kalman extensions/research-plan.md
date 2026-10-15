@@ -21,8 +21,8 @@ Do the phases in order. Do not write code, derivations, or manuscript prose unti
 | 1.1 | Read the nested ensemble Kalman filter paper | done | `notes/01-paper-context.md` |
 | 1.2 | Extract the open problems in the paper's own words | done | same file, section "Open problems" |
 | 1.3 | Freeze notation | done | same file, section "Notation" |
-| 2.1 | Summarise the eight PDFs already in `Literature/` | not started | `notes/02-literature-summary.md` |
-| 2.2 | Build the comparison table of neighbouring methods | not started | same file, section "Comparison" |
+| 2.1 | Summarise the eight PDFs already in `Literature/` | done | `notes/02-literature-summary.md` |
+| 2.2 | Build the comparison table of neighbouring methods | done | same file, section "Comparison" |
 | 3.1 | Obtain and file the missing named sources | not started | new PDFs in `Literature/`, rows in the summary |
 | 3.2 | Search for work the named sources do not cover | not started | `notes/03-search-log.md` and new summary rows |
 | 3.3 | Stop the search | not started | search log, section "Saturation" |
