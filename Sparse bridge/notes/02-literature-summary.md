@@ -55,24 +55,51 @@ What this paper does not give us: an incidence proposal, and a diagnostic for \(
 
 How it differs from Whitaker et al. (2025), Section 3.4: data-conditional simulation here is a forward-backward construction inside ABC for a diffusion. The 2025 guide is a closed-form hazard inside a particle filter for Poisson incidence.
 
-## Guides not stored
+## Golightly and Wilkinson (2015)
 
-These citations are copied from the reference list of Whitaker et al. (2025), pp. 27–28, which was read. The papers themselves were not.
+- Citation, as printed: Golightly, A. and Wilkinson, D. J. Bayesian inference for Markov jump processes with informative observations. *Statistical Applications in Genetics and Molecular Biology* 2015; 14(2): 169–188. DOI 10.1515/sagmb-2014-0070.
+- Path: `Sparse bridge/Literature/Golightly2015-informative-observations.pdf`. Header `%PDF` checked. The file matches the supplied copy byte for byte.
+- Reading: Sections 1 to 3.1, including Algorithms 1 to 3 and equation (9). Sections 3.2 to 6 were not used for the claims below.
+- Question the paper answers: parameter inference for a Markov jump process when discrete observations are informative, by proposing conditioned trajectories rather than forward simulation.
+- Part A: Section 3.1 approximates the remaining reaction counts \(\Delta R_s\) by a Gaussian whose mean and variance are the current hazard times the remaining time \(\Delta s\). That is a constant-hazard assumption on \((s, t]\). The conditioned hazard (9) is the conditional expectation of \(\Delta R_s\) given the Gaussian observation, divided by \(\Delta s\). The observation is of the state, \(Y_t = P' X_t + \varepsilon_t\), not of an incidence increment.
+- Part B: Algorithm 2 draws the next event time from an exponential distribution at the current value of (9), ignoring the explicit time dependence between events. Algorithm 3 weights by the complete-data likelihood ratio (10). This is a proposal for the jump process, not for the dSEIR Poisson grid.
+- What it does not give: a binomial or negative binomial observation of cumulative incidence, and a statement of when (9) fails. The failure of the constant-hazard step is stated later by Golightly and Sherlock (2019), Section 3.2.
+- How it differs from Whitaker et al. (2025), Section 3.4: the 2025 display has the same shape as (9), with the reaction-count vector in place of \(S\Delta R\) and with the binomial or negative binomial variance in place of \(\Sigma\). The 2015 paper is the source Whitaker et al. say they adapt. The adaptation itself is printed only in the 2025 Section 3.4.
 
-- Golightly, A. and Sherlock, C. (2019). "Efficient sampling of conditioned Markov jump processes." *Statistics and Computing* 29, 1149–1163. DOI 10.1007/s11222-019-09861-5. `[PDF NOT STORED]`. Required for part B. Whitaker et al. (2025), p. 25, name it as work that could be adapted. Lowe et al. (2023), pp. 9–10, give a secondary account and attribute the derivation of their propagation identities to this paper. That account is not a substitute.
-- Corstanje, M., van der Meulen, F. and Schauer, M. (2023). "Conditioning continuous-time Markov processes by guiding." *Stochastics* 95(6), 963–996. DOI 10.1080/17442508.2022.2150081. `[PDF NOT STORED]`. Required for part B, by the same sentence on p. 25. No opened paper states their algorithm. Nothing in this note describes it.
-- Golightly, A. and Wilkinson, D. J. (2015). "Bayesian inference for Markov jump processes with informative observations." *Statistical Applications in Genetics and Molecular Biology* 14(2), 169–188. DOI 10.1515/sagmb-2014-0070. `[PDF NOT STORED]`. Whitaker et al. (2025), pp. 2–3 and p. 24, say their bridge adapts this hazard. Until the PDF is stored, the only usable derivation is Section 3.4 of the 2025 paper.
+## Golightly and Sherlock (2019)
+
+- Citation, as printed: Golightly, A. and Sherlock, C. Efficient sampling of conditioned Markov jump processes. *Statistics and Computing* (2019) 29:1149–1163. DOI 10.1007/s11222-019-09861-5.
+- Path: `Sparse bridge/Literature/Golightly2019-conditioned-markov-jump.pdf`. Header `%PDF` checked. The file matches the supplied copy byte for byte.
+- Reading: the article through Section 6. Tables were read as printed. The proofs of the linear-noise ODE solution are cited by the paper to Fearnhead et al. (2014), which was not opened.
+- Question the paper answers: an approximate bridge for a Markov jump process between a known state and a partial or noisy Gaussian observation, cheap enough to use inside weighted resampling or particle MCMC.
+- Part A: Section 3.2 restates the Golightly and Wilkinson hazard as equation (5) and says that normality of the remaining reaction counts, and a hazard that is constant on the whole remaining interval, are often unreasonable. Section 5.1, the death model, says the linear form cannot adequately describe the exponential decay of the true conditioned process, and that effective sample size falls and relative mean squared error rises as the interval length \(T\) increases. Section 6 says that treating the remaining time as a single discretisation makes the bridges less accurate as the inter-observation time increases.
+- Part B: the proposal that addresses that failure is the Fearnhead hazard (6), with the transition density replaced by the linear-noise Gaussian. Equation (16) restarts the linear-noise ODEs at the current state. Equation (19) does not restart them: one integration of (11), (13) and (14), then the identities (17) and (18). Sampling uses Gillespie's method with that hazard, ignoring explicit time dependence between events, and truncating to keep the hazard positive. The weight is (3), the complete-data likelihood ratio, and the average unnormalised weight estimates the transition density (4). On the death model and on Lotka–Volterra, the without-restart linear-noise bridge keeps a high effective sample size as \(T\) grows, where (5) does not. The sampler is an MJP bridge under a Gaussian observation of the state. It is not a product of Poisson probabilities on a dSEIR grid, and the observation is not a binomial count of incidence.
+- What it does not give: a line-by-line replacement for \(q\) in Whitaker et al. (2025), Algorithm 2. The numerical comparisons use the `deSolve` package. This programme does not add that package.
+- How it differs from Whitaker et al. (2025), Section 3.4: equation (5) is the constant-hazard guide the 2025 display adapts. Equation (19) replaces the transition density inside (6), for a different observation and a different path measure.
+
+## Corstanje, van der Meulen and Schauer (2023)
+
+- Citation, as printed: Corstanje, M., van der Meulen, F. and Schauer, M. Conditioning continuous-time Markov processes by guiding. *Stochastics* 2023, 95(6), 963–996. DOI 10.1080/17442508.2022.2150081.
+- Path: `Sparse bridge/Literature/Corstanje2023-guiding-ctmc.pdf`. Header `%PDF` checked. The file matches the supplied copy byte for byte.
+- Reading: Sections 1, 2 and 4.1, the statement of Theorem 3.3, and Section 4.2 through Theorem 4.9. The appendix and the diffusion application in Section 5 were not used.
+- Question the paper answers: when a tractable guided process, obtained by replacing the function in Doob's \(h\)-transform, is equivalent to the process conditioned on its value at a fixed time, and what the likelihood ratio is.
+- Part A: not a statement about the 2025 hazard. Theorem 4.2 is the closest discrete example. It conditions an inhomogeneous Poisson process on an exact integer end-point.
+- Part B: Definition 2.5 and equation (4) define the guided process. For the Poisson process, the guide \(\tilde h\) is the transition probability (15) of a homogeneous Poisson process, and Theorem 4.2 gives the likelihood ratio (16) under the condition \(\tilde\lambda \le \min \lambda(x)\) on the states between the end-points. The ratio still contains \(h(0, x_0) = \Pr(X_T = x_T \mid X_0 = x_0)\) for the original process. For a state-dependent rate that probability is the intractable transition probability. Example 2.4 says a noisy end-point can be written as a mixture of exact conditionings. Section 4.1 does not carry that mixture out, and it does not treat a binomial observation of an increment on a grid.
+- What it does not give: an evaluable weight for Whitaker et al. (2025), Algorithm 2. The factor \(h(0, x_0)\) in (16) is not cancelled by anything printed in Theorem 4.2, and it depends on the particle's starting state.
+- How it differs from Whitaker et al. (2025), Section 3.4: guiding here changes the generator of a continuous-time Markov process and corrects with a likelihood ratio that still contains the true transition probability. The 2025 guide is a closed-form Poisson rate on a grid, corrected by the dSEIR transition and the observation mass function.
+
+## Guides still not stored
 
 Cited beside the bridge, and not the replacement:
 
-- Golightly and Kypraios (2018), named with "see also" on pp. 2–3 of Whitaker et al. (2025). The 2025 reference list gives *Statistics and Computing* 28(6), 1215–1230, DOI 10.1007/s11222-017-9789-8. `[PDF NOT STORED]`.
+- Golightly and Kypraios (2018), named with "see also" on pp. 2–3 of Whitaker et al. (2025). The 2025 reference list gives *Statistics and Computing* 28(6), 1215–1230, DOI 10.1007/s11222-017-9789-8. `[PDF NOT STORED]`. Not required to restate Section 3.4.
 - Whitaker et al. (2025) supplement, DOI 10.1214/25-BA1547SUPP. `[PDF NOT STORED]`. The main text, p. 26, says it contains further synthetic experiments and linear-noise details for the Ebola comparison.
 
 Named in the opened pages of Lowe et al. (2023) or Jovanovski et al. (2024), and not required to restate the 2025 guide:
 
 - Durham and Gallant (2002), the modified diffusion bridge. `[PDF NOT STORED]`.
 - Whitaker, Golightly, Boys and Sherlock (2017), the residual bridge and the version of that diffusion bridge used by Jovanovski et al. `[PDF NOT STORED]`. The 2023 and 2024 reference lists were not copied out in full; the titles were not re-derived here.
-- Fearnhead, Giagos and Sherlock (2014), cited by Lowe et al. for reinitialising the linear noise approximation. `[PDF NOT STORED]`.
+- Fearnhead, Giagos and Sherlock (2014). `[PDF NOT STORED]`. Golightly and Sherlock (2019) cite it for the linear-noise solution. The bridge identities (17) and (18) are printed in the 2019 paper and were read there. Lowe et al. cite the same paper for reinitialising the linear noise approximation.
 
 ## Comparison
 
@@ -85,12 +112,14 @@ A cell is filled only from a page that was read. "Secondary" means the sentence 
 | Lowe et al. (2023), residual bridge | A discretised chemical Langevin equation | The next observation, after a residual partition | `[NOT READ]` beyond the existence of the construct | Named on p. 10. Whitaker et al. (2017) not opened |
 | Modified diffusion bridge of Durham and Gallant | `[PDF NOT STORED]` | Lowe et al., p. 13, say it pushes particles towards the observations in a linear fashion, and that nonlinear behaviour between observations precludes it | `[PDF NOT STORED]` | Durham and Gallant (2002) not stored. The preclusion sentence was read in Lowe et al. |
 | Jovanovski et al. (2024) data-conditional simulation | `[NOT READ]`. The abstract and Section 8 describe forward and backward simulation of a diffusion | The observed diffusion path, in the sense of the discussion on pp. 25–26 | The sampler is ABC, not an importance correction of a dSEIR proposal | Section 8 read. The algorithm was not |
-| Golightly and Wilkinson (2015) | `[PDF NOT STORED]` | `[PDF NOT STORED]` | `[PDF NOT STORED]` | Named by Whitaker et al. (2025), pp. 2–3 and p. 24 |
-| Golightly and Sherlock (2019) | `[PDF NOT STORED]` | `[PDF NOT STORED]` at the source. The secondary account is the Lowe row above | `[PDF NOT STORED]` | Named by Whitaker et al. (2025), p. 25 |
-| Corstanje, van der Meulen and Schauer (2023) | `[PDF NOT STORED]` | `[PDF NOT STORED]` | `[PDF NOT STORED]` | Named by Whitaker et al. (2025), p. 25 |
+| Golightly and Wilkinson (2015), equation (9) | A Markov jump process, by exponential waiting times at the current conditioned hazard (Algorithm 2) | A Gaussian observation of the state. Remaining reaction counts are Gaussian with the hazard frozen on the whole remaining interval | Yes. Algorithm 3 uses the complete-data likelihood ratio (10) | Section 3.1, read |
+| Golightly and Sherlock (2019), equation (5) | Same construction as Golightly and Wilkinson (2015), equation (9) | Same Gaussian observation. Section 3.2 says the constant-hazard step is often unreasonable | Yes, through the weight (3) when this hazard is the proposal | Section 3.2, read |
+| Golightly and Sherlock (2019), equation (19) | A Markov jump process, by Gillespie's method with the linear-noise conditioned hazard, without restarting the ODEs | The same Gaussian observation, through the linear-noise transition density in the Fearnhead ratio (6) | Yes. The weight is (3), and (4) estimates the transition density | Sections 4.3 and 3.1, read |
+| Corstanje et al. (2023), Theorem 4.2 | An inhomogeneous Poisson process, with rates from the guided generator (4) and the homogeneous-Poisson guide (15) | An exact integer end-point \(X_T = x_T\) | The ratio (16) is printed, and it contains the intractable transition probability \(h(0, x_0)\) | Section 4.1, read. Not an Algorithm 2 weight |
 
 ## What phase 4 is not allowed to treat as settled
 
-- No opened paper states a numerical spacing at which the 2025 guide fails.
-- No opened paper shows that a bad \(h^{*}\) changes the target of Algorithm 2 rather than the quality of the proposal. The weight is printed; the implication is not.
-- No replacement proposal has been read at its source. The Lowe account of the 2019 hazard is a pointer, not an implementation.
+- No opened paper states a numerical spacing at which the 2025 guide fails. Golightly and Sherlock (2019), Section 5.1, report that degradation for a death process, not for dSEIR incidence.
+- The 2025 weight is printed. Whether a poor \(h^{*}\) changes the filtering target, or only the weights, is a reading for the theory note, not a theorem in the 2025 paper.
+- Equation (19) of Golightly and Sherlock (2019) has been read. It is not a product of dSEIR Poisson probabilities, so it is not yet a replacement for \(q\).
+- Theorem 4.2 of Corstanje et al. (2023) has been read. Its likelihood ratio is not free of the intractable transition probability.

@@ -81,7 +81,7 @@ Dependence on \(\theta\), \(\phi\), the contact rate and the incidence so far is
 
 End-point conditioned trajectories on \((t_{i-1}, t_i]\) are obtained by running Algorithm 1 with \(h\) replaced by \(h^{*}\) and with time step \(\Delta \tau\). The proposal density \(q\) is the product of Poisson probabilities with rates \(h^{*}(x_{\tau_{i,j}} \mid y_{t_i})\,\Delta \tau\), for \(j = 0, \ldots, m-1\) (p. 12).
 
-The introduction (pp. 2–3) says this construct adapts the bridge of Golightly and Wilkinson (2015); see also Golightly and Kypraios (2018). The summary (p. 24) repeats the attribution to Golightly and Wilkinson (2015). Neither PDF is stored. This note uses only what Section 3.4 prints.
+The introduction (pp. 2–3) says this construct adapts the bridge of Golightly and Wilkinson (2015); see also Golightly and Kypraios (2018). The summary (p. 24) repeats the attribution to Golightly and Wilkinson (2015). Amendment, 15 October 2026: Golightly and Wilkinson (2015) is now stored, and the literature note records the reading of equation (9). Golightly and Kypraios (2018) remains `[PDF NOT STORED]`. This note's account of the 2025 display still uses only what Section 3.4 prints.
 
 ## Applications, as described
 
@@ -131,7 +131,7 @@ Page 25, quoted:
 
 Part A of the research question is the failure named in the second and third sentences. Part B is the adaptation named in the last sentence. The paper says "likely", and it says "the true conditioned process". It does not give a numerical spacing at which the failure begins, and it does not say that the importance weight in Algorithm 2 then targets the wrong distribution. Those are questions for a later phase, not claims of this note.
 
-The same paragraph points at Golightly and Sherlock (2019) and Corstanje et al. (2023). Both are `[PDF NOT STORED]`. The scoping note's bullet under "From the epidemic paper" matches this paragraph. It is not scoping-note only.
+The same paragraph points at Golightly and Sherlock (2019) and Corstanje et al. (2023). Amendment, 15 October 2026: both PDFs are now stored, and the literature note records what was read. The sentence above was written when they were not. The scoping note's bullet under "From the epidemic paper" matches this paragraph. It is not scoping-note only.
 
 ### In the paper, outside this programme
 
@@ -181,4 +181,4 @@ The word "linear" is reserved for the assumption named on p. 25. Equation (12) i
 - Weekly Ebola counts and weekly COVID-19 counts: described and plotted, not tabulated, and not stored as a data file.
 - `https://github.com/Sam-Whitaker/Sequential_Bayes_Epi`: named on p. 12, not copied here.
 - Supplement, DOI 10.1214/25-BA1547SUPP: named on p. 26. The main text says it contains further synthetic experiments and the linear-noise derivation for the Ebola comparison. `[PDF NOT STORED]`.
-- Golightly and Wilkinson (2015), Golightly and Kypraios (2018), Golightly and Sherlock (2019), Corstanje et al. (2023): cited. `[PDF NOT STORED]`. Bibliographic details as printed in the reference list are in the literature note.
+- Amendment, 15 October 2026. Golightly and Wilkinson (2015), Golightly and Sherlock (2019) and Corstanje et al. (2023) are stored under `Sparse bridge/Literature/`. The previous sentence marked them `[PDF NOT STORED]`. Golightly and Kypraios (2018) is still `[PDF NOT STORED]`. Bibliographic details as printed in the reference list are in the literature note.
